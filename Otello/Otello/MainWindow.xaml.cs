@@ -23,6 +23,12 @@ namespace Otello
         public MainWindow()
         {
             InitializeComponent();
+            
+            Game game = new Game();
+            game.Board.DisplayBoardInConsole();
+            game.Board.PlayMove(3, 2, false);
+            Console.WriteLine();
+            game.Board.DisplayBoardInConsole();
         }
     }
 }

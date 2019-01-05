@@ -23,7 +23,7 @@ namespace Otello
             this.playerBlack = playerBlack;
             this.playerWhite = playerWhite;
 
-            board = new int[,] { };
+            board = new int[columnsNumber, linesNumber];
 
             InitBoard();
         }
@@ -55,7 +55,7 @@ namespace Otello
 
         public bool IsPlayable(int column, int line, bool isWhite)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public bool PlayMove(int column, int line, bool isWhite)
@@ -78,35 +78,142 @@ namespace Otello
                     currentPlayerID = playerBlack.ID;
                 }
 
-                ChangeLine(line, column, currentPlayerID);
-                ChangeColumn(line, column, currentPlayerID);
-                ChangeDiagonal(line, column, currentPlayerID);
+                CheckChangeOnLine(line, column, currentPlayerID);
+                CheckChangeOnColumn(line, column, currentPlayerID);
+                CheckChangeOnDiagonal(line, column, currentPlayerID);
             }
 
             return false;
         }
 
-        private void ChangeLine(int line, int column, int playerID)
+        /// <summary>
+        /// Display the current board in console
+        /// </summary>
+        public void DisplayBoardInConsole()
+        {
+            for (int i = 0; i < linesNumber; i++)
+            {
+                for (int j = 0; j < columnsNumber; j++)
+                {
+                    Console.Write(board[j, i] + "\t");
+                }
+                Console.WriteLine();
+            }
+            Console.Read();
+        }
+
+        /// <summary>
+        /// Check if their are change on the line of the given disc
+        /// </summary>
+        /// <param name="line">The indicated line</param>
+        /// <param name="column">The indicated column</param>
+        /// <param name="playerID">The player ID</param>
+        private void CheckChangeOnLine(int line, int column, int playerID)
         {
             for (int i = column + 1; i < columnsNumber; i++)
             {
-                // if(i > )
+                // Don't apply change if their is an empty case
+                if (board[i, line] == emptyCaseID)
+                {
+                    break;
+                }
+
+                if (board[i, line] == playerID)
+                {
+                    ChangeCaseOnBoard(new Tuple<int, int>(column, line), new Tuple<int, int>(i, line), playerID);
+                }
             }
 
-            for (int i = column; i >= 0; i--)
+            for (int i = column - 1; i >= 0; i--)
             {
+                // Don't apply change if their is an empty case
+                if (board[i, line] == emptyCaseID)
+                {
+                    break;
+                }
 
+                if (board[i, line] == playerID)
+                {
+                    ChangeCaseOnBoard(new Tuple<int, int>(column, line), new Tuple<int, int>(i, line), playerID);
+                }
             }
         }
 
-        private void ChangeColumn(int line, int column, int playerID)
-        {
 
+        /// <summary>
+        /// Check if their are change on the column of the given disc
+        /// </summary>
+        /// <param name="line">The indicated line</param>
+        /// <param name="column">The indicated column</param>
+        /// <param name="playerID">The player ID</param>
+        private void CheckChangeOnColumn(int line, int column, int playerID)
+        {
+            for (int i = line + 1; i < linesNumber; i++)
+            {
+                // Don't apply change if their is an empty case
+                if (board[column, i] == emptyCaseID)
+                {
+                    break;
+                }
+
+                if (board[column, i] == playerID)
+                {
+                    ChangeCaseOnBoard(new Tuple<int, int>(column, line), new Tuple<int, int>(column, i), playerID);
+                }
+            }
+
+            for (int i = line - 1; i >= 0; i--)
+            {
+                // Don't apply change if their is an empty case
+                if (board[column, i] == emptyCaseID)
+                {
+                    break;
+                }
+
+                if (board[column, i] == playerID)
+                {
+                    ChangeCaseOnBoard(new Tuple<int, int>(column, line), new Tuple<int, int>(column, i), playerID);
+                }
+            }
         }
 
-        private void ChangeDiagonal(int line, int column, int playerID)
-        {
 
+        /// <summary>
+        /// Check if their are change on the diagonal of the given disc
+        /// </summary>
+        /// <param name="line">The indicated line</param>
+        /// <param name="column">The indicated column</param>
+        /// <param name="playerID">The player ID</param>
+        private void CheckChangeOnDiagonal(int line, int column, int playerID)
+        {
+        }
+
+        private void ChangeCaseOnBoard(Tuple<int, int> firstCase, Tuple<int, int> secondCase, int playerID)
+        {
+            int minCol = firstCase.Item1,
+                minLine = firstCase.Item2,
+                maxCol = secondCase.Item1,
+                maxLine = secondCase.Item2;
+
+            if(secondCase.Item1 < minCol)
+            {
+                minCol = secondCase.Item1;
+                maxCol = firstCase.Item1;
+            }
+
+            if(secondCase.Item2 < minLine)
+            {
+                minLine = secondCase.Item2;
+                maxLine = firstCase.Item2;
+            }
+
+            for (int col = minCol; col <= maxCol; col++)
+            {
+                for (int line = minLine; line <= maxLine; line++)
+                {
+                    board[col, line] = playerID;
+                }
+            }
         }
 
         /// <summary>
