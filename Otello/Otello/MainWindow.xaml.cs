@@ -26,7 +26,19 @@ namespace Otello
             
             Game game = new Game();
             game.Board.DisplayBoardInConsole();
-            game.Board.PlayMove(3, 2, false);
+            game.Board.PlayMove(3, 3, false);
+            Console.WriteLine();
+            game.Board.DisplayBoardInConsole();
+            game.Board.PlayMove(3, 2, true);
+            Console.WriteLine();
+            game.Board.DisplayBoardInConsole();
+            game.Board.PlayMove(4, 2, false);
+            Console.WriteLine();
+            game.Board.DisplayBoardInConsole();
+            game.Board.PlayMove(3, 4, true);
+            Console.WriteLine();
+            game.Board.DisplayBoardInConsole();
+            game.Board.PlayMove(5, 2, true);
             Console.WriteLine();
             game.Board.DisplayBoardInConsole();
         }
