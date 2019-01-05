@@ -254,6 +254,11 @@ namespace Otello
             }
         }
 
+        /// <summary>
+        /// Change given cases on the board with the given player id.
+        /// </summary>
+        /// <param name="casesToChange">Given cases to change</param>
+        /// <param name="playerID">Given player id</param>
         private void ChangeCaseOnBoard(List<Tuple<int, int>> casesToChange, int playerID)
         {
             foreach (Tuple<int, int> item in casesToChange)
