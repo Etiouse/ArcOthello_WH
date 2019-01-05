@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Otello
 {
@@ -14,37 +10,37 @@ namespace Otello
         private readonly int columnsNumber;
 
         private readonly int emptyCaseID;
-        private readonly int player1CaseID;
-        private readonly int player2CaseID;
+
+        private Player playerBlack;
+        private Player playerWhite;
 
         public Board(int linesNumber, int columnsNumber, int emptyCaseID,
-            int player1CaseID, int player2CaseID)
+            Player playerBlack, Player playerWhite)
         {
             this.linesNumber = linesNumber;
             this.columnsNumber = columnsNumber;
             this.emptyCaseID = emptyCaseID;
-            this.player1CaseID = player1CaseID;
-            this.player2CaseID = player2CaseID;
+            this.playerBlack = playerBlack;
+            this.playerWhite = playerWhite;
 
             board = new int[,] { };
 
-            for (int i = 0; i < columnsNumber; i++)
-            {
-                for (int j = 0; j < linesNumber; j++)
-                {
-                    board[i, j] = emptyCaseID;
-                }
-            }
+            InitBoard();
         }
 
         public int GetBlackScore()
         {
-            throw new NotImplementedException();
+            return playerBlack.Score;
+        }
+
+        public int GetWhiteScore()
+        {
+            return playerWhite.Score;
         }
 
         public int[,] GetBoard()
         {
-            throw new NotImplementedException();
+            return board;
         }
 
         public string GetName()
@@ -57,11 +53,6 @@ namespace Otello
             throw new NotImplementedException();
         }
 
-        public int GetWhiteScore()
-        {
-            throw new NotImplementedException();
-        }
-
         public bool IsPlayable(int column, int line, bool isWhite)
         {
             throw new NotImplementedException();
@@ -69,7 +60,76 @@ namespace Otello
 
         public bool PlayMove(int column, int line, bool isWhite)
         {
-            throw new NotImplementedException();
+            bool doesColumnExists = column >= 0 && column < columnsNumber;
+            bool doesLineExists = line >= 0 && line < linesNumber;
+
+            if (doesColumnExists &&
+                doesLineExists &&
+                IsPlayable(column, line, isWhite))
+            {
+                int currentPlayerID;
+
+                if(isWhite)
+                {
+                    currentPlayerID = playerWhite.ID;
+                }
+                else
+                {
+                    currentPlayerID = playerBlack.ID;
+                }
+
+                ChangeLine(line, column, currentPlayerID);
+                ChangeColumn(line, column, currentPlayerID);
+                ChangeDiagonal(line, column, currentPlayerID);
+            }
+
+            return false;
+        }
+
+        private void ChangeLine(int line, int column, int playerID)
+        {
+            for (int i = column + 1; i < columnsNumber; i++)
+            {
+                // if(i > )
+            }
+
+            for (int i = column; i >= 0; i--)
+            {
+
+            }
+        }
+
+        private void ChangeColumn(int line, int column, int playerID)
+        {
+
+        }
+
+        private void ChangeDiagonal(int line, int column, int playerID)
+        {
+
+        }
+
+        /// <summary>
+        /// Fill the board with init discs (4 in the center).
+        /// </summary>
+        private void InitBoard()
+        {
+            for (int i = 0; i < columnsNumber; i++)
+            {
+                for (int j = 0; j < linesNumber; j++)
+                {
+                    board[i, j] = emptyCaseID;
+                }
+            }
+
+            int columnCenter = columnsNumber / 2;
+            int lineCenter = linesNumber / 2;
+
+            // init board with 4 discs (2 for each player) on the center of the board.
+            board[columnCenter, lineCenter] = playerWhite.ID;
+            board[columnCenter + 1, lineCenter + 1] = playerWhite.ID;
+            board[columnCenter, lineCenter + 1] = playerBlack.ID;
+            board[columnCenter + 1, lineCenter] = playerBlack.ID;
         }
     }
 }
