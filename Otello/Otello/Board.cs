@@ -68,12 +68,7 @@ namespace Otello
 
         public bool PlayMove(int column, int line, bool isWhite)
         {
-            bool doesColumnExists = column >= 0 && column < columnsNumber;
-            bool doesLineExists = line >= 0 && line < linesNumber;
-
-            if (doesColumnExists &&
-                doesLineExists &&
-                IsPlayable(column, line, isWhite))
+            if (IsPlayable(column, line, isWhite))
             {
                 int currentPlayerID;
 
@@ -87,6 +82,8 @@ namespace Otello
                 }
 
                 CheckChangesOnBoard(line, column, currentPlayerID);
+
+                return true;
             }
 
             return false;
@@ -97,15 +94,25 @@ namespace Otello
         /// </summary>
         public void DisplayBoardInConsole()
         {
+            Console.Write("\t");
+
+            for (int i = 0; i < columnsNumber; i++)
+            {
+                Console.Write(i + "\t");
+            }
+
+            Console.WriteLine();
+
             for (int i = 0; i < linesNumber; i++)
             {
+                Console.Write(i + "\t");
+
                 for (int j = 0; j < columnsNumber; j++)
                 {
                     Console.Write(board[j, i] + "\t");
                 }
                 Console.WriteLine();
             }
-            Console.Read();
         }
 
         /// <summary>

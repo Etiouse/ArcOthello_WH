@@ -23,24 +23,33 @@ namespace Otello
         public MainWindow()
         {
             InitializeComponent();
-            
-            Game game = new Game();
+
+            // Comment line bellow to use graphic console
+            PlayGameInConsole();
+        }
+
+        private void PlayGameInConsole()
+        {
+            Game game = new Game(true, true);
+
+            ConsoleManager.Show();
+
+            Console.WriteLine("Welcome in Otello WH !");
+            Console.WriteLine("Board size : " + Game.COLUMNS_NUMBER + "x" + Game.LINES_NUMBER);
             game.Board.DisplayBoardInConsole();
-            game.Board.PlayMove(3, 3, false);
-            Console.WriteLine();
-            game.Board.DisplayBoardInConsole();
-            game.Board.PlayMove(3, 2, true);
-            Console.WriteLine();
-            game.Board.DisplayBoardInConsole();
-            game.Board.PlayMove(4, 2, false);
-            Console.WriteLine();
-            game.Board.DisplayBoardInConsole();
-            game.Board.PlayMove(3, 4, true);
-            Console.WriteLine();
-            game.Board.DisplayBoardInConsole();
-            game.Board.PlayMove(5, 2, true);
-            Console.WriteLine();
-            game.Board.DisplayBoardInConsole();
+            Console.WriteLine("White begins !");
+
+            while (true)
+            {
+                Console.WriteLine(game.CurrentPlayerColor() + " turn !");
+                Console.WriteLine("Case you want to play in (format : column line)");
+
+                string[] newCase = Console.ReadLine().Split(' ');
+                int col = int.Parse(newCase[0]);
+                int line = int.Parse(newCase[1]);
+
+                game.PlayMove(col, line);
+            }
         }
     }
 }
