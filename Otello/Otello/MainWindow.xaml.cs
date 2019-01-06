@@ -39,7 +39,7 @@ namespace Otello
             game.Board.DisplayBoardInConsole();
             Console.WriteLine("White begins !");
 
-            while (true)
+            while (game.GameStart)
             {
                 Console.WriteLine(game.CurrentPlayerColor() + " turn !");
                 Console.WriteLine("Case you want to play in (format : column line)");

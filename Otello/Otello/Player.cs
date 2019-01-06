@@ -10,13 +10,11 @@ namespace Otello
     {
         public int ID { get; private set; }
         public string Name { get; private set; }
-        public int Score { get; private set; }
 
         public Player(int id, string name)
         {
             ID = id;
             Name = name;
-            Score = 0;
         }
     }
 }

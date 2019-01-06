@@ -5,6 +5,9 @@ namespace Otello
 {
     class Board : IPlayable.IPlayable
     {
+        public Player PlayerBlack { get; private set; }
+        public Player PlayerWhite { get; private set; }
+
         private readonly int[,] board;
 
         private readonly int linesNumber;
@@ -12,17 +15,14 @@ namespace Otello
 
         private readonly int emptyCaseID;
 
-        private Player playerBlack;
-        private Player playerWhite;
-
         public Board(int linesNumber, int columnsNumber, int emptyCaseID,
             Player playerBlack, Player playerWhite)
         {
             this.linesNumber = linesNumber;
             this.columnsNumber = columnsNumber;
             this.emptyCaseID = emptyCaseID;
-            this.playerBlack = playerBlack;
-            this.playerWhite = playerWhite;
+            this.PlayerBlack = playerBlack;
+            this.PlayerWhite = playerWhite;
 
             board = new int[columnsNumber, linesNumber];
 
@@ -31,12 +31,38 @@ namespace Otello
 
         public int GetBlackScore()
         {
-            return playerBlack.Score;
+            int newPlayerScore = 0;
+
+            for (int i = 0; i < columnsNumber; i++)
+            {
+                for (int j = 0; j < linesNumber; j++)
+                {
+                    if(board[i, j] == PlayerBlack.ID)
+                    {
+                        newPlayerScore++;
+                    }
+                }
+            }
+            
+            return newPlayerScore;
         }
 
         public int GetWhiteScore()
         {
-            return playerWhite.Score;
+            int newPlayerScore = 0;
+
+            for (int i = 0; i < columnsNumber; i++)
+            {
+                for (int j = 0; j < linesNumber; j++)
+                {
+                    if (board[i, j] == PlayerWhite.ID)
+                    {
+                        newPlayerScore++;
+                    }
+                }
+            }
+            
+            return newPlayerScore;
         }
 
         public int[,] GetBoard()
@@ -84,11 +110,11 @@ namespace Otello
 
                 if(isWhite)
                 {
-                    currentPlayerID = playerWhite.ID;
+                    currentPlayerID = PlayerWhite.ID;
                 }
                 else
                 {
-                    currentPlayerID = playerBlack.ID;
+                    currentPlayerID = PlayerBlack.ID;
                 }
 
                 return CheckChangesOnBoard(line, column, currentPlayerID);
@@ -225,10 +251,10 @@ namespace Otello
             int lineCenter = linesNumber / 2;
 
             // init board with 4 discs (2 for each player) on the center of the board.
-            board[columnCenter, lineCenter] = playerWhite.ID;
-            board[columnCenter + 1, lineCenter + 1] = playerWhite.ID;
-            board[columnCenter, lineCenter + 1] = playerBlack.ID;
-            board[columnCenter + 1, lineCenter] = playerBlack.ID;
+            board[columnCenter, lineCenter] = PlayerWhite.ID;
+            board[columnCenter + 1, lineCenter + 1] = PlayerWhite.ID;
+            board[columnCenter, lineCenter + 1] = PlayerBlack.ID;
+            board[columnCenter + 1, lineCenter] = PlayerBlack.ID;
         }
     }
 }

@@ -10,6 +10,8 @@ namespace Otello
     {
         public Board Board { get; private set; }
 
+        public bool GameStart { get; private set; }
+
         public const int COLUMNS_NUMBER = 9;
         public const int LINES_NUMBER = 7;
 
@@ -29,6 +31,8 @@ namespace Otello
 
             whiteTurn = whiteBegins;
             this.drawInConsole = drawInConsole;
+
+            GameStart = true;
         }
 
         public bool PlayMove(int col, int line)
@@ -39,6 +43,7 @@ namespace Otello
             {
                 if (drawInConsole)
                 {
+                    Console.WriteLine("White score : " + Board.GetWhiteScore() + " | Black score : " + Board.GetBlackScore());
                     Console.WriteLine("New board state :");
                     Board.DisplayBoardInConsole();
                 }
@@ -54,7 +59,7 @@ namespace Otello
                     Board.DisplayBoardInConsole();
                 }
             }
-
+            
             return false;
         }
 
