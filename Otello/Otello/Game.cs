@@ -51,6 +51,7 @@ namespace Otello
                 if (drawInConsole)
                 {
                     Console.WriteLine("Not a valid case !");
+                    Board.DisplayBoardInConsole();
                 }
             }
 

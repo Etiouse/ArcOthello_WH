@@ -61,7 +61,17 @@ namespace Otello
                 return false;
             }
 
-
+            if (board[column, line + 1] == emptyCaseID &&
+                board[column, line - 1] == emptyCaseID &&
+                board[column + 1, line] == emptyCaseID &&
+                board[column - 1, line] == emptyCaseID &&
+                board[column + 1, line + 1] == emptyCaseID &&
+                board[column + 1, line - 1] == emptyCaseID &&
+                board[column - 1, line + 1] == emptyCaseID &&
+                board[column - 1, line - 1] == emptyCaseID)
+            {
+                return false;
+            }
 
             return true;
         }
@@ -81,9 +91,7 @@ namespace Otello
                     currentPlayerID = playerBlack.ID;
                 }
 
-                CheckChangesOnBoard(line, column, currentPlayerID);
-
-                return true;
+                return CheckChangesOnBoard(line, column, currentPlayerID);
             }
 
             return false;
@@ -121,8 +129,10 @@ namespace Otello
         /// <param name="line">The indicated line</param>
         /// <param name="column">The indicated column</param>
         /// <param name="playerID">The player ID</param>
-        private void CheckChangesOnBoard(int line, int column, int playerID)
+        private bool CheckChangesOnBoard(int line, int column, int playerID)
         {
+            bool madeChanges = false;
+
             int[,] incDirections = new int[,]
             {
                 // down right
@@ -163,7 +173,14 @@ namespace Otello
                     }
                     else if (board[currentCol, currentLine] == playerID)
                     {
+                        // Doesn't apply changes if the cases to change is only the placed disc or less.
+                        if (casesToChange.Count <= 1)
+                        {
+                            break;
+                        }
+
                         ApplyChangesOnBoard(casesToChange, playerID);
+                        madeChanges = true;
                     }
                     else
                     {
@@ -174,6 +191,8 @@ namespace Otello
                     currentLine += incDirections[i, 0];
                 }
             }
+
+            return madeChanges;
         }
 
         /// <summary>
