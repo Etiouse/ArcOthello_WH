@@ -56,6 +56,13 @@ namespace Otello
 
         public bool IsPlayable(int column, int line, bool isWhite)
         {
+            if (column < 0 || column >= columnsNumber || line < 0 || line >= linesNumber)
+            {
+                return false;
+            }
+
+
+
             return true;
         }
 
@@ -79,9 +86,7 @@ namespace Otello
                     currentPlayerID = playerBlack.ID;
                 }
 
-                CheckChangeOnLine(line, column, currentPlayerID);
-                CheckChangeOnColumn(line, column, currentPlayerID);
-                CheckChangeOnDiagonal(line, column, currentPlayerID);
+                CheckChangesOnBoard(line, column, currentPlayerID);
             }
 
             return false;
@@ -104,114 +109,14 @@ namespace Otello
         }
 
         /// <summary>
-        /// Check if their are change on the line of the given disc
-        /// </summary>
-        /// <param name="line">The indicated line</param>
-        /// <param name="column">The indicated column</param>
-        /// <param name="playerID">The player ID</param>
-        private void CheckChangeOnLine(int line, int column, int playerID)
-        {
-            List<Tuple<int, int>> casesToChange = new List<Tuple<int, int>>();
-            casesToChange.Add(new Tuple<int, int>(column, line));
-
-            for (int i = column + 1; i < columnsNumber; i++)
-            {
-                // Don't apply change if their is an empty case
-                if (board[i, line] == emptyCaseID)
-                {
-                    break;
-                }
-                if (board[i, line] == playerID)
-                {
-                    ChangeCaseOnBoard(casesToChange, playerID);
-                }
-                else
-                {
-                    casesToChange.Add(new Tuple<int, int>(i, line));
-                }
-            }
-
-            casesToChange.Clear();
-            casesToChange.Add(new Tuple<int, int>(column, line));
-
-            for (int i = column - 1; i >= 0; i--)
-            {
-                // Don't apply change if their is an empty case
-                if (board[i, line] == emptyCaseID)
-                {
-                    break;
-                }
-                if (board[i, line] == playerID)
-                {
-                    ChangeCaseOnBoard(casesToChange, playerID);
-                }
-                else
-                {
-                    casesToChange.Add(new Tuple<int, int>(i, line));
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// Check if their are change on the column of the given disc
-        /// </summary>
-        /// <param name="line">The indicated line</param>
-        /// <param name="column">The indicated column</param>
-        /// <param name="playerID">The player ID</param>
-        private void CheckChangeOnColumn(int line, int column, int playerID)
-        {
-            List<Tuple<int, int>> casesToChange = new List<Tuple<int, int>>();
-            casesToChange.Add(new Tuple<int, int>(column, line));
-
-            for (int i = line + 1; i < linesNumber; i++)
-            {
-                // Don't apply change if their is an empty case
-                if (board[column, i] == emptyCaseID)
-                {
-                    break;
-                }
-                if (board[column, i] == playerID)
-                {
-                    ChangeCaseOnBoard(casesToChange, playerID);
-                }
-                else
-                {
-                    casesToChange.Add(new Tuple<int, int>(column, i));
-                }
-            }
-
-            casesToChange.Clear();
-            casesToChange.Add(new Tuple<int, int>(column, line));
-
-            for (int i = line - 1; i >= 0; i--)
-            {
-                // Don't apply change if their is an empty case
-                if (board[column, i] == emptyCaseID)
-                {
-                    break;
-                }
-                if (board[column, i] == playerID)
-                {
-                    ChangeCaseOnBoard(casesToChange, playerID);
-                }
-                else
-                {
-                    casesToChange.Add(new Tuple<int, int>(column, i));
-                }
-            }
-        }
-
-
-        /// <summary>
         /// Check if their are change on all the diagonals of the given disc
         /// </summary>
         /// <param name="line">The indicated line</param>
         /// <param name="column">The indicated column</param>
         /// <param name="playerID">The player ID</param>
-        private void CheckChangeOnDiagonal(int line, int column, int playerID)
+        private void CheckChangesOnBoard(int line, int column, int playerID)
         {
-            int[,] inc = new int[,]
+            int[,] incDirections = new int[,]
             {
                 // down right
                 {1, 1 },
@@ -220,18 +125,28 @@ namespace Otello
                 // up right
                 {-1, 1 },
                 // up left
-                {-1, -1 }
+                {-1, -1 },
+                // right
+                {0, 1 },
+                // left
+                {0, -1 },
+                // up
+                {-1, 0 },
+                // down
+                {1, 0 }
             };
 
             List<Tuple<int, int>> casesToChange = new List<Tuple<int, int>>();
 
-            for (int i = 0; i < inc.GetLength(0); i++)
+            // For each direction
+            for (int i = 0; i < incDirections.GetLength(0); i++)
             {
-                int currentCol = column + inc[i, 1], currentLine = line + inc[i, 0];
+                int currentCol = column + incDirections[i, 1], currentLine = line + incDirections[i, 0];
 
                 casesToChange.Clear();
                 casesToChange.Add(new Tuple<int, int>(column, line));
 
+                // While the current column and the current line are in the board
                 while (currentCol >= 0 && currentCol < columnsNumber && currentLine >= 0 && currentLine < linesNumber)
                 {
                     // Don't apply change if their is an empty case
@@ -241,15 +156,15 @@ namespace Otello
                     }
                     else if (board[currentCol, currentLine] == playerID)
                     {
-                        ChangeCaseOnBoard(casesToChange, playerID);
+                        ApplyChangesOnBoard(casesToChange, playerID);
                     }
                     else
                     {
                         casesToChange.Add(new Tuple<int, int>(currentCol, currentLine));
                     }
 
-                    currentCol += inc[i, 1];
-                    currentLine += inc[i, 0];
+                    currentCol += incDirections[i, 1];
+                    currentLine += incDirections[i, 0];
                 }
             }
         }
@@ -259,7 +174,7 @@ namespace Otello
         /// </summary>
         /// <param name="casesToChange">Given cases to change</param>
         /// <param name="playerID">Given player id</param>
-        private void ChangeCaseOnBoard(List<Tuple<int, int>> casesToChange, int playerID)
+        private void ApplyChangesOnBoard(List<Tuple<int, int>> casesToChange, int playerID)
         {
             foreach (Tuple<int, int> item in casesToChange)
             {
