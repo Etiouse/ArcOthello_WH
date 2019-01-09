@@ -30,19 +30,19 @@ namespace Otello
 
         private void PlayGameInConsole()
         {
-            Game game = new Game(true, true);
+            Game game = new Game(false, true);
 
             ConsoleManager.Show();
 
             Console.WriteLine("Welcome in Otello WH !");
             Console.WriteLine("Board size : " + Game.COLUMNS_NUMBER + "x" + Game.LINES_NUMBER);
             game.Board.DisplayBoardInConsole();
-            Console.WriteLine("White begins !");
 
             while (game.GameStart)
             {
                 Console.WriteLine(game.CurrentPlayerColor() + " turn !");
                 Console.WriteLine("Case you want to play in (format : column line)");
+                game.FindNextPossibleMoves();
 
                 string[] newCase = Console.ReadLine().Split(' ');
                 int col = int.Parse(newCase[0]);

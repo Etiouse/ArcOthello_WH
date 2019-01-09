@@ -11,6 +11,7 @@ namespace Otello
         public Board Board { get; private set; }
 
         public bool GameStart { get; private set; }
+        public bool WhiteTurn { get; private set; }
 
         public const int COLUMNS_NUMBER = 9;
         public const int LINES_NUMBER = 7;
@@ -19,41 +20,66 @@ namespace Otello
         private const int PLAYER_BLACK_CASE_ID = 1;
         private const int PLAYER_WHITE_CASE_ID = 0;
 
-        private bool whiteTurn;
-        private bool drawInConsole;
+        private bool writeInConsole;
 
-        public Game(bool whiteBegins, bool drawInConsole)
+        public Game(bool whiteBegins, bool writeInConsole)
         {
             Player playerBlack = new Player(PLAYER_BLACK_CASE_ID, "Black player");
             Player playerWhite = new Player(PLAYER_WHITE_CASE_ID, "White player");
 
             Board = new Board(LINES_NUMBER, COLUMNS_NUMBER, EMPTY_CASE_ID, playerBlack, playerWhite);
 
-            whiteTurn = whiteBegins;
-            this.drawInConsole = drawInConsole;
+            WhiteTurn = whiteBegins;
+            this.writeInConsole = writeInConsole;
 
             GameStart = true;
         }
 
+        public List<Tuple<int, int>> FindNextPossibleMoves()
+        {
+            List<Tuple<int, int>> nextPossibleMoves;
+
+            if (WhiteTurn)
+            {
+                nextPossibleMoves = Board.GetNextPossibleMoves(Board.PlayerWhite.ID);
+            }
+            else
+            {
+                nextPossibleMoves = Board.GetNextPossibleMoves(Board.PlayerBlack.ID);
+            }
+
+            if(writeInConsole)
+            {
+                Console.WriteLine("Next possible moves : ");
+                foreach (Tuple<int, int> nextPossibleMove in nextPossibleMoves)
+                {
+                    Console.WriteLine("( " + nextPossibleMove.Item1 + " ; " + nextPossibleMove.Item2 + " )");
+                }
+            }
+
+            return nextPossibleMoves;
+        }
+
         public bool PlayMove(int col, int line)
         {
-            bool validMove = Board.PlayMove(col, line, whiteTurn);
+            bool validMove = Board.PlayMove(col, line, WhiteTurn);
 
             if (validMove)
             {
-                if (drawInConsole)
+                WhiteTurn = !WhiteTurn;
+
+                if (writeInConsole)
                 {
-                    Console.WriteLine("White score : " + Board.GetWhiteScore() + " | Black score : " + Board.GetBlackScore());
+                    Console.WriteLine("White score : " + Board.PlayerWhite.Score + " | Black score : " + Board.PlayerBlack.Score);
                     Console.WriteLine("New board state :");
                     Board.DisplayBoardInConsole();
                 }
 
-                whiteTurn = !whiteTurn;
                 return true;
             }
             else
             {
-                if (drawInConsole)
+                if (writeInConsole)
                 {
                     Console.WriteLine("Not a valid case !");
                     Board.DisplayBoardInConsole();
@@ -71,7 +97,7 @@ namespace Otello
         {
             string currentPlayerColor;
 
-            if (whiteTurn)
+            if (WhiteTurn)
             {
                 currentPlayerColor = "White";
             }

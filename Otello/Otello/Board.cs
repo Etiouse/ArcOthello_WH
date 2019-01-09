@@ -31,38 +31,12 @@ namespace Otello
 
         public int GetBlackScore()
         {
-            int newPlayerScore = 0;
-
-            for (int i = 0; i < columnsNumber; i++)
-            {
-                for (int j = 0; j < linesNumber; j++)
-                {
-                    if(board[i, j] == PlayerBlack.ID)
-                    {
-                        newPlayerScore++;
-                    }
-                }
-            }
-            
-            return newPlayerScore;
+            return PlayerBlack.Score;
         }
 
         public int GetWhiteScore()
         {
-            int newPlayerScore = 0;
-
-            for (int i = 0; i < columnsNumber; i++)
-            {
-                for (int j = 0; j < linesNumber; j++)
-                {
-                    if (board[i, j] == PlayerWhite.ID)
-                    {
-                        newPlayerScore++;
-                    }
-                }
-            }
-            
-            return newPlayerScore;
+            return PlayerWhite.Score;
         }
 
         public int[,] GetBoard()
@@ -82,24 +56,17 @@ namespace Otello
 
         public bool IsPlayable(int column, int line, bool isWhite)
         {
-            if (column < 0 || column >= columnsNumber || line < 0 || line >= linesNumber)
+            if (column < 0 ||
+                column >= columnsNumber ||
+                line < 0 ||
+                line >= linesNumber ||
+                board[column, line] == PlayerWhite.ID ||
+                board[column, line] == PlayerBlack.ID)
             {
                 return false;
             }
 
-            if (board[column, line + 1] == emptyCaseID &&
-                board[column, line - 1] == emptyCaseID &&
-                board[column + 1, line] == emptyCaseID &&
-                board[column - 1, line] == emptyCaseID &&
-                board[column + 1, line + 1] == emptyCaseID &&
-                board[column + 1, line - 1] == emptyCaseID &&
-                board[column - 1, line + 1] == emptyCaseID &&
-                board[column - 1, line - 1] == emptyCaseID)
-            {
-                return false;
-            }
-
-            return true;
+            return !CheckIsolation(column, line);
         }
 
         public bool PlayMove(int column, int line, bool isWhite)
@@ -117,10 +84,50 @@ namespace Otello
                     currentPlayerID = PlayerBlack.ID;
                 }
 
-                return CheckChangesOnBoard(line, column, currentPlayerID);
+                List<Tuple<int, int>> casesToChange = CheckChangesOnBoard(line, column, currentPlayerID);
+                
+                if(casesToChange.Count > 0)
+                {
+                    UpdatePlayerScore(currentPlayerID, casesToChange.Count);
+
+                    ApplyChangesOnBoard(casesToChange, currentPlayerID);
+                    return true;
+                }
+
+                return false;
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Get all the next possible moves for a given player id.
+        /// </summary>
+        /// <param name="playerID">The current player id</param>
+        /// <returns>The next possible moves</returns>
+        public List<Tuple<int, int>> GetNextPossibleMoves(int playerID)
+        {
+            List<Tuple<int, int>> nextPossibleCases = new List<Tuple<int, int>>();
+
+            for (int col = 0; col < columnsNumber; col++)
+            {
+                for (int line = 0; line < linesNumber; line++)
+                {
+                    if (board[col, line] != PlayerWhite.ID &&
+                        board[col, line] != PlayerBlack.ID &&
+                        !CheckIsolation(col, line))
+                    {
+                        List<Tuple<int, int>> casesToChange = CheckChangesOnBoard(line, col, playerID);
+
+                        if (casesToChange.Count > 0)
+                        {
+                            nextPossibleCases.Add(new Tuple<int, int>(col, line));
+                        }
+                    }
+                }
+            }
+
+            return nextPossibleCases;
         }
 
         /// <summary>
@@ -150,15 +157,51 @@ namespace Otello
         }
 
         /// <summary>
+        /// Check if a case is isolated (surounded by empty case).
+        /// </summary>
+        /// <param name="column">The column of the case to check</param>
+        /// <param name="line">The line of the case to check</param>
+        /// <returns>true if case is isolated, false otherwise</returns>
+        private bool CheckIsolation(int column, int line)
+        {
+            bool isIsolated = true;
+
+            for (int i = -1; i < 2; i++)
+            {
+                for (int j = -1; j < 2; j++)
+                {
+                    if (i == 0 && j == 0)
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        if (board[column + i, line + j] == PlayerWhite.ID ||
+                            board[column + i, line + j] == PlayerBlack.ID)
+                        {
+                            isIsolated = false;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            return isIsolated;
+        }
+        
+        /// <summary>
         /// Check if their are change on all the diagonals of the given disc
         /// </summary>
         /// <param name="line">The indicated line</param>
         /// <param name="column">The indicated column</param>
         /// <param name="playerID">The player ID</param>
-        private bool CheckChangesOnBoard(int line, int column, int playerID)
+        /// <returns>The list of cases to change if this move is applied on the board</returns>
+        private List<Tuple<int, int>> CheckChangesOnBoard(int line, int column, int playerID)
         {
-            bool madeChanges = false;
-
             int[,] incDirections = new int[,]
             {
                 // down right
@@ -179,38 +222,55 @@ namespace Otello
                 {1, 0 }
             };
 
+            int otherPlayer = PlayerWhite.ID;
+
+            if(playerID == PlayerWhite.ID)
+            {
+                otherPlayer = PlayerBlack.ID;
+            }
+
             List<Tuple<int, int>> casesToChange = new List<Tuple<int, int>>();
 
             // For each direction
             for (int i = 0; i < incDirections.GetLength(0); i++)
             {
+                List<Tuple<int, int>> casesToChangeInCurrentDirection = new List<Tuple<int, int>>();
                 int currentCol = column + incDirections[i, 1], currentLine = line + incDirections[i, 0];
-
-                casesToChange.Clear();
-                casesToChange.Add(new Tuple<int, int>(column, line));
+                bool isValidCase = true;
+                
+                casesToChangeInCurrentDirection.Add(new Tuple<int, int>(column, line));
 
                 // While the current column and the current line are in the board
-                while (currentCol >= 0 && currentCol < columnsNumber && currentLine >= 0 && currentLine < linesNumber)
+                while (isValidCase &&
+                    currentCol >= 0 &&
+                    currentCol < columnsNumber && 
+                    currentLine >= 0 &&
+                    currentLine < linesNumber)
                 {
                     // Don't apply change if their is an empty case
                     if (board[currentCol, currentLine] == emptyCaseID)
                     {
-                        break;
+                        isValidCase = false;
                     }
                     else if (board[currentCol, currentLine] == playerID)
                     {
                         // Doesn't apply changes if the cases to change is only the placed disc or less.
-                        if (casesToChange.Count <= 1)
+                        if (casesToChangeInCurrentDirection.Count <= 1)
                         {
-                            break;
+                            isValidCase = false;
                         }
-
-                        ApplyChangesOnBoard(casesToChange, playerID);
-                        madeChanges = true;
+                        else
+                        {
+                            casesToChange.AddRange(casesToChangeInCurrentDirection);
+                        }
+                    }
+                    else if(board[currentCol, currentLine] == otherPlayer)
+                    {
+                        casesToChangeInCurrentDirection.Add(new Tuple<int, int>(currentCol, currentLine));
                     }
                     else
                     {
-                        casesToChange.Add(new Tuple<int, int>(currentCol, currentLine));
+                        isValidCase = false;
                     }
 
                     currentCol += incDirections[i, 1];
@@ -218,7 +278,26 @@ namespace Otello
                 }
             }
 
-            return madeChanges;
+            return casesToChange;
+        }
+
+        /// <summary>
+        /// Update the score.
+        /// </summary>
+        /// <param name="addToPlayerId"></param>
+        /// <param name="addedScore"></param>
+        private void UpdatePlayerScore(int addToPlayerId, int addedScore)
+        {
+            if(addToPlayerId == PlayerBlack.ID)
+            {
+                PlayerBlack.Score += addedScore;
+                PlayerWhite.Score -= (addedScore - 1);
+            }
+            else
+            {
+                PlayerWhite.Score += addedScore;
+                PlayerBlack.Score -= (addedScore - 1);
+            }
         }
 
         /// <summary>
@@ -255,6 +334,9 @@ namespace Otello
             board[columnCenter + 1, lineCenter + 1] = PlayerWhite.ID;
             board[columnCenter, lineCenter + 1] = PlayerBlack.ID;
             board[columnCenter + 1, lineCenter] = PlayerBlack.ID;
+
+            PlayerWhite.Score = 2;
+            PlayerBlack.Score = 2;
         }
     }
 }
