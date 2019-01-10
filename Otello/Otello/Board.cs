@@ -245,13 +245,13 @@ namespace Otello
                 {1, 0 }
             };
 
-            int otherPlayer = PlayerBlack.ID;
             int playerID = PlayerWhite.ID;
+            int otherPlayer = PlayerBlack.ID;
 
-            if(isWhite)
+            if(!isWhite)
             {
-                otherPlayer = PlayerWhite.ID;
                 playerID = PlayerBlack.ID;
+                otherPlayer = PlayerWhite.ID;
             }
 
             List<Tuple<int, int>> casesToChange = new List<Tuple<int, int>>();
