@@ -20,12 +20,54 @@ namespace Otello
     /// </summary>
     public partial class MainWindow : Window
     {
+        private bool inConsole = false;
+        private Grid grid;
+        private const int COLUMNS = 9;
+        private const int ROWS = 7;
+
         public MainWindow()
         {
             InitializeComponent();
 
-            // Comment line bellow to use graphic console
-            PlayGameInConsole();
+            if (inConsole)
+            {
+                PlayGameInConsole();
+            }
+            else
+            {
+                PlayGameInInterface();
+            }
+        }
+
+        private void PlayGameInInterface()
+        {
+            grid = new Grid
+            {
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Width = 450,
+                Height = 350,
+                Background = Brushes.ForestGreen,
+                ShowGridLines = true
+            };
+
+            for (int i = 0; i < COLUMNS; i++)
+            {
+                grid.ColumnDefinitions.Add(new ColumnDefinition());
+            }
+            for (int i = 0; i < ROWS; i++)
+            {
+                grid.RowDefinitions.Add(new RowDefinition());
+            }
+
+            Content = grid;
+
+            //Game game = new Game(true, inConsole);
+            //while (game.GameStart)
+            //{
+                //game.FindNextPossibleMoves();
+                //game.PlayMove(col, line);
+            //}
         }
 
         private void PlayGameInConsole()
