@@ -35,7 +35,7 @@ namespace Otello
             ConsoleManager.Show();
 
             Console.WriteLine("Welcome in Otello WH !");
-            Console.WriteLine("Board size : " + Game.COLUMNS_NUMBER + "x" + Game.LINES_NUMBER);
+            Console.WriteLine("Board size : " + Board.COLUMNS_NUMBER + "x" + Board.LINES_NUMBER);
             game.Board.DisplayBoardInConsole();
 
             while (game.GameStart)

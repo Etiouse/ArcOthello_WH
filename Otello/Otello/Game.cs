@@ -13,21 +13,11 @@ namespace Otello
         public bool GameStart { get; private set; }
         public bool WhiteTurn { get; private set; }
 
-        public const int COLUMNS_NUMBER = 9;
-        public const int LINES_NUMBER = 7;
-
-        private const int EMPTY_CASE_ID = -1;
-        private const int PLAYER_BLACK_CASE_ID = 1;
-        private const int PLAYER_WHITE_CASE_ID = 0;
-
         private bool writeInConsole;
 
         public Game(bool whiteBegins, bool writeInConsole)
         {
-            Player playerBlack = new Player(PLAYER_BLACK_CASE_ID, "Black player");
-            Player playerWhite = new Player(PLAYER_WHITE_CASE_ID, "White player");
-
-            Board = new Board(LINES_NUMBER, COLUMNS_NUMBER, EMPTY_CASE_ID, playerBlack, playerWhite);
+            Board = new Board();
 
             WhiteTurn = whiteBegins;
             this.writeInConsole = writeInConsole;
@@ -70,7 +60,7 @@ namespace Otello
 
                 if (writeInConsole)
                 {
-                    Console.WriteLine("White score : " + Board.PlayerWhite.Score + " | Black score : " + Board.PlayerBlack.Score);
+                    Console.WriteLine(Board.PlayerWhite.Name + " : " + Board.PlayerWhite.Score + " | " + Board.PlayerBlack.Name + " : " + Board.PlayerBlack.Score);
                     Console.WriteLine("New board state :");
                     Board.DisplayBoardInConsole();
                 }

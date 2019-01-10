@@ -5,26 +5,24 @@ namespace Otello
 {
     class Board : IPlayable.IPlayable
     {
+        public const int COLUMNS_NUMBER = 9;
+        public const int LINES_NUMBER = 7;
+
+        private const int EMPTY_CASE_ID = -1;
+        private const int PLAYER_BLACK_CASE_ID = 1;
+        private const int PLAYER_WHITE_CASE_ID = 0;
+
         public Player PlayerBlack { get; private set; }
         public Player PlayerWhite { get; private set; }
 
         private readonly int[,] board;
 
-        private readonly int linesNumber;
-        private readonly int columnsNumber;
-
-        private readonly int emptyCaseID;
-
-        public Board(int linesNumber, int columnsNumber, int emptyCaseID,
-            Player playerBlack, Player playerWhite)
+        public Board()
         {
-            this.linesNumber = linesNumber;
-            this.columnsNumber = columnsNumber;
-            this.emptyCaseID = emptyCaseID;
-            this.PlayerBlack = playerBlack;
-            this.PlayerWhite = playerWhite;
+            PlayerBlack = new Player(PLAYER_BLACK_CASE_ID, "Black player");
+            PlayerWhite = new Player(PLAYER_WHITE_CASE_ID, "White player");
 
-            board = new int[columnsNumber, linesNumber];
+            board = new int[COLUMNS_NUMBER, LINES_NUMBER];
 
             InitBoard();
         }
@@ -57,9 +55,9 @@ namespace Otello
         public bool IsPlayable(int column, int line, bool isWhite)
         {
             if (column < 0 ||
-                column >= columnsNumber ||
+                column >= COLUMNS_NUMBER ||
                 line < 0 ||
-                line >= linesNumber ||
+                line >= LINES_NUMBER ||
                 board[column, line] == PlayerWhite.ID ||
                 board[column, line] == PlayerBlack.ID)
             {
@@ -109,9 +107,9 @@ namespace Otello
         {
             List<Tuple<int, int>> nextPossibleCases = new List<Tuple<int, int>>();
 
-            for (int col = 0; col < columnsNumber; col++)
+            for (int col = 0; col < COLUMNS_NUMBER; col++)
             {
-                for (int line = 0; line < linesNumber; line++)
+                for (int line = 0; line < LINES_NUMBER; line++)
                 {
                     if (board[col, line] != PlayerWhite.ID &&
                         board[col, line] != PlayerBlack.ID &&
@@ -137,18 +135,18 @@ namespace Otello
         {
             Console.Write("\t");
 
-            for (int i = 0; i < columnsNumber; i++)
+            for (int i = 0; i < COLUMNS_NUMBER; i++)
             {
                 Console.Write(i + "\t");
             }
 
             Console.WriteLine();
 
-            for (int i = 0; i < linesNumber; i++)
+            for (int i = 0; i < LINES_NUMBER; i++)
             {
                 Console.Write(i + "\t");
 
-                for (int j = 0; j < columnsNumber; j++)
+                for (int j = 0; j < COLUMNS_NUMBER; j++)
                 {
                     Console.Write(board[j, i] + "\t");
                 }
@@ -243,12 +241,12 @@ namespace Otello
                 // While the current column and the current line are in the board
                 while (isValidCase &&
                     currentCol >= 0 &&
-                    currentCol < columnsNumber && 
+                    currentCol < COLUMNS_NUMBER && 
                     currentLine >= 0 &&
-                    currentLine < linesNumber)
+                    currentLine < LINES_NUMBER)
                 {
                     // Don't apply change if their is an empty case
-                    if (board[currentCol, currentLine] == emptyCaseID)
+                    if (board[currentCol, currentLine] == EMPTY_CASE_ID)
                     {
                         isValidCase = false;
                     }
@@ -318,16 +316,16 @@ namespace Otello
         /// </summary>
         private void InitBoard()
         {
-            for (int i = 0; i < columnsNumber; i++)
+            for (int i = 0; i < COLUMNS_NUMBER; i++)
             {
-                for (int j = 0; j < linesNumber; j++)
+                for (int j = 0; j < LINES_NUMBER; j++)
                 {
-                    board[i, j] = emptyCaseID;
+                    board[i, j] = EMPTY_CASE_ID;
                 }
             }
 
-            int columnCenter = columnsNumber / 2;
-            int lineCenter = linesNumber / 2;
+            int columnCenter = COLUMNS_NUMBER / 2;
+            int lineCenter = LINES_NUMBER / 2;
 
             // init board with 4 discs (2 for each player) on the center of the board.
             board[columnCenter, lineCenter] = PlayerWhite.ID;
