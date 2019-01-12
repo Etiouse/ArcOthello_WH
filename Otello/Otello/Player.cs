@@ -18,6 +18,7 @@ namespace Otello
             ID = id;
             Name = name;
             Score = 0;
+            Time = new TimeSpan(0);
         }
     }
 }
