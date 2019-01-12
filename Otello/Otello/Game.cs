@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace Otello
 {
@@ -13,7 +14,11 @@ namespace Otello
         public bool GameStart { get; private set; }
         public bool WhiteTurn { get; private set; }
 
-        private bool writeInConsole;
+        public SolidColorBrush WhiteColor { get; private set; }
+        public SolidColorBrush BlackColor { get; private set; }
+        public SolidColorBrush PreviewColor { get; private set; }
+
+        private readonly bool writeInConsole;
 
         public Game(bool whiteBegins, bool writeInConsole)
         {
@@ -23,6 +28,9 @@ namespace Otello
             this.writeInConsole = writeInConsole;
 
             GameStart = true;
+            WhiteColor = Brushes.Red;
+            BlackColor = Brushes.Blue;
+            PreviewColor = Brushes.White;
         }
 
         public List<Tuple<int, int>> FindNextPossibleMoves()
@@ -73,7 +81,7 @@ namespace Otello
                     Board.DisplayBoardInConsole();
                 }
             }
-            
+
             return false;
         }
 
@@ -81,20 +89,16 @@ namespace Otello
         /// Returns the color of the current player turn
         /// </summary>
         /// <returns>The color of the current player turn</returns>
-        public string CurrentPlayerColor()
+        public SolidColorBrush CurrentPlayerColor()
         {
-            string currentPlayerColor;
-
             if (WhiteTurn)
             {
-                currentPlayerColor = "White";
+                return WhiteColor;
             }
             else
             {
-                currentPlayerColor = "Black";
+                return BlackColor;
             }
-
-            return currentPlayerColor;
         }
     }
 }

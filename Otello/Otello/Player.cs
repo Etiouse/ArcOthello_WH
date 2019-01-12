@@ -11,6 +11,7 @@ namespace Otello
         public int ID { get; private set; }
         public string Name { get; private set; }
         public int Score { get; set; }
+        public TimeSpan Time { get; set; }
 
         public Player(int id, string name)
         {

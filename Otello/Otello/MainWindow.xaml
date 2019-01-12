@@ -24,17 +24,33 @@
         <!-- Data panel-->
         <Rectangle Grid.Row="0" Fill="Black"></Rectangle>
         <Rectangle Grid.Row="2" Fill="Black"></Rectangle>
-        <!-- Timer -->
-        <DockPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="135">
-            <Label Grid.Row="0" Content="TIMER" Foreground="#3855b4" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
-        </DockPanel>
-        <!-- Players scores -->
-        <DockPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="20,0,20,0">
-            <Label Grid.Row="0" Content="SCORE 1" Foreground="#3855b4" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
-        </DockPanel>
-        <DockPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,20,0">
-            <Label Grid.Row="0" Content="SCORE 2" Foreground="#3855b4" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
-        </DockPanel>
+
+        <Grid Name="dataGrid" Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"></ColumnDefinition>
+                <ColumnDefinition Width="150"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="150"></ColumnDefinition>
+                <ColumnDefinition Width="150"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <!-- Players scores and timers-->
+            <DockPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="20,0,20,0">
+                <Label Content="{Binding WhiteScore}" Foreground="Red" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
+            </DockPanel>
+            <DockPanel Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="135">
+                <Label Content="{Binding WhiteTime}" Foreground="Red" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
+            </DockPanel>
+            <DockPanel Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" Width="135">
+                <Label Content="{Binding BlackTime}" Foreground="Blue" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
+            </DockPanel>
+            <DockPanel Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,20,0">
+                <Label Content="{Binding BlackScore}" Foreground="Blue" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
+            </DockPanel>
+        </Grid>
         <!-- Grille -->
         <Rectangle Name="gameBackground" Grid.Row="1" Fill="WHITE"></Rectangle>
         <Grid Name="gameGrid" Grid.Row="1"></Grid>

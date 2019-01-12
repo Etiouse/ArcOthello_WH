@@ -22,19 +22,19 @@ namespace Otello
     {
         private int sizeCells;
         private Game game;
-
-        private const int COLUMNS = 9;
-        private const int ROWS = 7;
+        private SolidColorBrush colorWhitePlayer = Brushes.Red;
+        private SolidColorBrush colorBlackPlayer = Brushes.Blue;
 
         public MainWindow()
         {
-            game = new Game(false, false);
+            game = new Game(true, false);
+            DataContext = game.Board;
         }
 
         public void UpdateSize(object sender, RoutedEventArgs e)
         {
-            sizeCells = (int)Math.Min(layout.ColumnDefinitions[0].ActualWidth / (COLUMNS + 2),
-                                       layout.RowDefinitions[1].ActualHeight / (ROWS + 2));
+            sizeCells = (int)Math.Min(layout.ColumnDefinitions[0].ActualWidth / (Board.COLUMNS_NUMBER + 2),
+                                       layout.RowDefinitions[1].ActualHeight / (Board.LINES_NUMBER + 2));
             InitGridPosition();
 
             for (int i = 0; i < gameGrid.ColumnDefinitions.Count; i++)
@@ -52,14 +52,38 @@ namespace Otello
                 rect.Width = sizeCells - 1;
                 rect.Height = sizeCells - 1;
             }
+
+            foreach (UIElement child in gameGrid.Children.OfType<Ellipse>())
+            {
+                Ellipse ellipse = (Ellipse) child;
+                ellipse.Width = sizeCells - 1;
+                ellipse.Height = sizeCells - 1;
+            }
         }
 
         override
         protected void OnSourceInitialized(EventArgs args)
         {
-            sizeCells = (int)Math.Min(layout.ColumnDefinitions[0].ActualWidth / (COLUMNS + 2),
-                                       layout.RowDefinitions[1].ActualHeight / (ROWS + 2));
+            sizeCells = (int)Math.Min(layout.ColumnDefinitions[0].ActualWidth / (Board.COLUMNS_NUMBER + 2),
+                                       layout.RowDefinitions[1].ActualHeight / (Board.LINES_NUMBER + 2));
             PlayGameInInterface();
+        }
+
+        private void ClickEvent(object sender, MouseButtonEventArgs e)
+        {
+            int x = Grid.GetColumn(sender as UIElement) - 1;
+            int y = Grid.GetRow(sender as UIElement) - 1;
+
+            List<Tuple<int, int>> possibilities = game.FindNextPossibleMoves();
+            foreach (Tuple<int, int> possibility in possibilities)
+            {
+                if (possibility.Item1 == x && possibility.Item2 == y)
+                {
+                    game.PlayMove(possibility.Item1, possibility.Item2);
+                    DrawTokens();
+                    DisplayPossibilites();
+                }
+            }
         }
 
         private void PlayGameInInterface()
@@ -68,12 +92,15 @@ namespace Otello
             InitGridLabels();
             InitGrid();
             InitGridDisplay();
+
+            DrawTokens();
+            DisplayPossibilites();
         }
 
         private void InitGridPosition()
         {
-            int shiftLeft = (int)(layout.ColumnDefinitions[0].ActualWidth - (COLUMNS + 2) * sizeCells) / 2;
-            int shiftTop = (int)(layout.RowDefinitions[1].ActualHeight - (ROWS + 2) * sizeCells) / 2;
+            int shiftLeft = (int)(layout.ColumnDefinitions[0].ActualWidth - (Board.COLUMNS_NUMBER + 2) * sizeCells) / 2;
+            int shiftTop = (int)(layout.RowDefinitions[1].ActualHeight - (Board.LINES_NUMBER + 2) * sizeCells) / 2;
             gameGrid.Margin = new Thickness(shiftLeft, shiftTop, 0, 0);
         }
 
@@ -81,7 +108,7 @@ namespace Otello
         {
             // Colonnes
             char letter = 'A';
-            for (int i = 1; i <= COLUMNS; i++)
+            for (int i = 1; i <= Board.COLUMNS_NUMBER; i++)
             {
                 ColumnDefinition column = new ColumnDefinition
                 {
@@ -105,7 +132,7 @@ namespace Otello
             }
 
             // Lignes
-            for (int i = 1; i <= ROWS; i++)
+            for (int i = 1; i <= Board.LINES_NUMBER; i++)
             {
                 RowDefinition row = new RowDefinition
                 {
@@ -129,7 +156,7 @@ namespace Otello
 
         private void InitGrid()
         {
-            for (int i = 1; i <= COLUMNS; i++)
+            for (int i = 1; i <= Board.COLUMNS_NUMBER; i++)
             {
                 ColumnDefinition column = new ColumnDefinition
                 {
@@ -137,7 +164,7 @@ namespace Otello
                 };
                 gameGrid.ColumnDefinitions.Add(column);
 
-                for (int j = 1; j <= COLUMNS; j++)
+                for (int j = 1; j <= Board.LINES_NUMBER; j++)
                 {
                     RowDefinition row = new RowDefinition
                     {
@@ -151,25 +178,126 @@ namespace Otello
         private void InitGridDisplay()
         {
             Rectangle rect;
-            for (int i = 1; i <= COLUMNS; i++)
+            for (int i = 1; i <= Board.COLUMNS_NUMBER; i++)
             {
-                for (int j = 1; j <= ROWS; j++)
+                for (int j = 1; j <= Board.LINES_NUMBER; j++)
                 {
+                    // Display cell
                     rect = new Rectangle
                     {
                         Height = sizeCells - 1,
                         Width = sizeCells - 1,
                         Fill = Brushes.Black
                     };
-
+                    
                     Grid.SetColumn(rect, i);
                     Grid.SetRow(rect, j);
 
                     gameGrid.Children.Add(rect);
+
+                    // Interactive cell
+                    rect = new Rectangle
+                    {
+                        Height = sizeCells - 1,
+                        Width = sizeCells - 1,
+                        Fill = Brushes.Transparent
+                    };
+                    rect.MouseLeftButtonUp += new MouseButtonEventHandler(ClickEvent);
+
+                    Grid.SetColumn(rect, i);
+                    Grid.SetRow(rect, j);
+                    Panel.SetZIndex(rect, 4);
+
+                    gameGrid.Children.Add(rect);
+                }
+            }
+
+            Ellipse ellipse = new Ellipse
+            {
+                Height = dataGrid.RowDefinitions[0].ActualHeight - 20,
+                Width = dataGrid.RowDefinitions[0].ActualHeight - 20,
+                Fill = colorWhitePlayer
+            };
+            Grid.SetColumn(ellipse, 2);
+            Grid.SetRow(ellipse, 0);
+            dataGrid.Children.Add(ellipse);
+        }
+
+        private void DrawTokens()
+        {
+            int[,] board = game.Board.GetBoard(); 
+            
+            for (int i = 0; i < board.GetLength(0); i++)
+            {
+                for (int j = 0; j < board.GetLength(1); j++)
+                {
+                    if (board[i, j] >= 0)
+                    {
+                        Ellipse ellipse = new Ellipse
+                        {
+                            Height = sizeCells - 10,
+                            Width = sizeCells - 10
+                        };
+                        if (board[i, j] == 0)
+                        {
+                            ellipse.Fill = colorWhitePlayer;
+                        } else
+                        {
+                            ellipse.Fill = colorBlackPlayer;
+                        }
+                        Grid.SetColumn(ellipse, i + 1);
+                        Grid.SetRow(ellipse, j + 1);
+
+                        gameGrid.Children.Add(ellipse);
+                    }
                 }
             }
         }
-        
+
+        private void DisplayPossibilites()
+        {
+            List<Tuple<int, int>> possibilities = game.FindNextPossibleMoves();
+
+            // Delete previous possible moves
+            List<UIElement> elementsToBeDeleted = new List<UIElement>();
+            foreach (UIElement child in gameGrid.Children.OfType<Ellipse>())
+            {
+                if (((Ellipse) child).Fill == game.PreviewColor)
+                {
+                    elementsToBeDeleted.Add(child);
+                }
+            }
+            foreach (UIElement element in elementsToBeDeleted)
+            {
+                gameGrid.Children.Remove(element);
+            }
+
+            // Display possible moves
+            foreach (Tuple<int, int> possibility in possibilities)
+            {
+                Ellipse ellipse = new Ellipse
+                {
+                    Height = sizeCells - 10,
+                    Width = sizeCells - 10,
+                    Fill = game.PreviewColor
+                };
+                
+                Grid.SetColumn(ellipse, possibility.Item1 + 1);
+                Grid.SetRow(ellipse, possibility.Item2 + 1);
+                gameGrid.Children.Add(ellipse);
+            }
+            
+            // Update the current player information
+            for (int i = 0; i < dataGrid.Children.Count; i++)
+            {
+                UIElement element = dataGrid.Children[i];
+                if (Grid.GetRow(element) == 0 && Grid.GetColumn(element) == 2)
+                {
+                    Ellipse rect = (Ellipse) element;
+                    rect.Fill = game.CurrentPlayerColor();
+                }
+            }
+        }
 
         private void PlayGameInConsole()
         {

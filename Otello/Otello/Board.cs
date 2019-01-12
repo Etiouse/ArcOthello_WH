@@ -1,21 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Otello
 {
-    class Board : IPlayable.IPlayable
+    class Board : IPlayable.IPlayable, INotifyPropertyChanged
     {
         public const int COLUMNS_NUMBER = 9;
         public const int LINES_NUMBER = 7;
-
         private const int EMPTY_CASE_ID = -1;
         private const int PLAYER_BLACK_CASE_ID = 1;
         private const int PLAYER_WHITE_CASE_ID = 0;
 
         public Player PlayerBlack { get; private set; }
         public Player PlayerWhite { get; private set; }
+        public int WhiteScore
+        {
+            get { return PlayerWhite.Score; }
+            set { PlayerWhite.Score = value; RaisePropertyChanged("WhiteScore"); }
+        }
+        public int BlackScore
+        {
+            get { return PlayerBlack.Score; }
+            set { PlayerBlack.Score = value; RaisePropertyChanged("BlackScore"); }
+        }
+        public TimeSpan WhiteTime
+        {
+            get { return new TimeSpan(PlayerWhite.Time.Hours, PlayerWhite.Time.Minutes, PlayerWhite.Time.Seconds); }
+            set { PlayerWhite.Time = value; RaisePropertyChanged("WhiteTime"); }
+        }
+        public TimeSpan BlackTime
+        {
+            get { return new TimeSpan(PlayerBlack.Time.Hours, PlayerBlack.Time.Minutes, PlayerBlack.Time.Seconds); }
+            set { PlayerBlack.Time = value; RaisePropertyChanged("BlackTime"); }
+        }
+
+        void RaisePropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private readonly int[,] board;
+        private DateTime dateTime;
 
         public Board()
         {
@@ -23,6 +50,7 @@ namespace Otello
             PlayerWhite = new Player(PLAYER_WHITE_CASE_ID, "White player");
 
             board = new int[COLUMNS_NUMBER, LINES_NUMBER];
+            dateTime = DateTime.Now;
 
             InitBoard();
         }
@@ -85,15 +113,18 @@ namespace Otello
             if(casesToChange.Count > 0)
             {
                 int currentPlayerID;
-
+                DateTime time = DateTime.Now;
                 if (isWhite)
                 {
                     currentPlayerID = PlayerWhite.ID;
+                    WhiteTime += time - dateTime;
                 }
                 else
                 {
                     currentPlayerID = PlayerBlack.ID;
+                    BlackTime += time - dateTime;
                 }
+                dateTime = time;
 
                 UpdatePlayerScore(currentPlayerID, casesToChange.Count);
 
@@ -315,13 +346,13 @@ namespace Otello
         {
             if(addToPlayerId == PlayerBlack.ID)
             {
-                PlayerBlack.Score += addedScore;
-                PlayerWhite.Score -= (addedScore - 1);
+                BlackScore += addedScore;
+                WhiteScore -= (addedScore - 1);
             }
             else
             {
-                PlayerWhite.Score += addedScore;
-                PlayerBlack.Score -= (addedScore - 1);
+                WhiteScore += addedScore;
+                BlackScore -= (addedScore - 1);
             }
         }
 
@@ -360,8 +391,8 @@ namespace Otello
             board[columnCenter, lineCenter + 1] = PlayerBlack.ID;
             board[columnCenter + 1, lineCenter] = PlayerBlack.ID;
 
-            PlayerWhite.Score = 2;
-            PlayerBlack.Score = 2;
+            WhiteScore = 2;
+            BlackScore = 2;
         }
     }
 }
