@@ -28,15 +28,8 @@ namespace Otello
         public List<Tuple<int, int>> FindNextPossibleMoves()
         {
             List<Tuple<int, int>> nextPossibleMoves;
-
-            if (WhiteTurn)
-            {
-                nextPossibleMoves = Board.GetNextPossibleMoves(Board.PlayerWhite.ID);
-            }
-            else
-            {
-                nextPossibleMoves = Board.GetNextPossibleMoves(Board.PlayerBlack.ID);
-            }
+            
+            nextPossibleMoves = Board.GetNextPossibleMoves(WhiteTurn);
 
             if(writeInConsole)
             {
@@ -52,7 +45,12 @@ namespace Otello
 
         public bool PlayMove(int col, int line)
         {
-            bool validMove = Board.PlayMove(col, line, WhiteTurn);
+            bool validMove = false;
+
+            if (Board.IsPlayable(col, line, WhiteTurn))
+            {
+                validMove = Board.PlayMove(col, line, WhiteTurn);
+            }
 
             if (validMove)
             {

@@ -44,7 +44,7 @@ namespace Otello
 
         public string GetName()
         {
-            return "WH_IA";
+            return "IA_WH";
         }
 
         public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
@@ -54,26 +54,39 @@ namespace Otello
 
         public bool IsPlayable(int column, int line, bool isWhite)
         {
-            if (column < 0 ||
-                column >= COLUMNS_NUMBER ||
-                line < 0 ||
-                line >= LINES_NUMBER ||
-                board[column, line] == PlayerWhite.ID ||
-                board[column, line] == PlayerBlack.ID)
+            // Check if the move is not out of the board and
+            // if their is not a disc on the case.
+            if (!CheckUsableCase(column, line))
             {
                 return false;
             }
 
-            return !CheckIsolation(column, line);
+            // Check if the case is isolated
+            if (CheckIsolation(column, line))
+            {
+                return false;
+            }
+
+            // Check if their is change to make on the board.
+            List<Tuple<int, int>> casesToChange = CheckChangesOnBoard(line, column, isWhite);
+
+            if (casesToChange.Count <= 0)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public bool PlayMove(int column, int line, bool isWhite)
         {
-            if (IsPlayable(column, line, isWhite))
+            List<Tuple<int, int>> casesToChange = CheckChangesOnBoard(line, column, isWhite);
+                
+            if(casesToChange.Count > 0)
             {
                 int currentPlayerID;
 
-                if(isWhite)
+                if (isWhite)
                 {
                     currentPlayerID = PlayerWhite.ID;
                 }
@@ -82,17 +95,10 @@ namespace Otello
                     currentPlayerID = PlayerBlack.ID;
                 }
 
-                List<Tuple<int, int>> casesToChange = CheckChangesOnBoard(line, column, currentPlayerID);
-                
-                if(casesToChange.Count > 0)
-                {
-                    UpdatePlayerScore(currentPlayerID, casesToChange.Count);
+                UpdatePlayerScore(currentPlayerID, casesToChange.Count);
 
-                    ApplyChangesOnBoard(casesToChange, currentPlayerID);
-                    return true;
-                }
-
-                return false;
+                ApplyChangesOnBoard(casesToChange, currentPlayerID);
+                return true;
             }
 
             return false;
@@ -101,9 +107,9 @@ namespace Otello
         /// <summary>
         /// Get all the next possible moves for a given player id.
         /// </summary>
-        /// <param name="playerID">The current player id</param>
+        /// <param name="isWhite">Is true if white, flase if black</param>
         /// <returns>The next possible moves</returns>
-        public List<Tuple<int, int>> GetNextPossibleMoves(int playerID)
+        public List<Tuple<int, int>> GetNextPossibleMoves(bool isWhite)
         {
             List<Tuple<int, int>> nextPossibleCases = new List<Tuple<int, int>>();
 
@@ -113,9 +119,10 @@ namespace Otello
                 {
                     if (board[col, line] != PlayerWhite.ID &&
                         board[col, line] != PlayerBlack.ID &&
+                        CheckUsableCase(col, line) &&
                         !CheckIsolation(col, line))
                     {
-                        List<Tuple<int, int>> casesToChange = CheckChangesOnBoard(line, col, playerID);
+                        List<Tuple<int, int>> casesToChange = CheckChangesOnBoard(line, col, isWhite);
 
                         if (casesToChange.Count > 0)
                         {
@@ -155,6 +162,27 @@ namespace Otello
         }
 
         /// <summary>
+        /// Check if the case is on the board and if the case is not occupied.
+        /// </summary>
+        /// <param name="column">The column of the case on the board</param>
+        /// <param name="line">The line of the case on the board</param>
+        /// <returns>True if case is on the board and if it's not occupied, false otherwise</returns>
+        private bool CheckUsableCase(int column, int line)
+        {
+            if (column >= 0 &&
+                column < COLUMNS_NUMBER &&
+                line >= 0 &&
+                line < LINES_NUMBER &&
+                board[column, line] != PlayerWhite.ID &&
+                board[column, line] != PlayerBlack.ID)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Check if a case is isolated (surounded by empty case).
         /// </summary>
         /// <param name="column">The column of the case to check</param>
@@ -168,12 +196,13 @@ namespace Otello
             {
                 for (int j = -1; j < 2; j++)
                 {
-                    if (i == 0 && j == 0)
-                    {
-                        continue;
-                    }
-
-                    try
+                    // Test if the case is in the board and
+                    if (i != 0 &&
+                        j != 0 &&
+                        column + i >= 0 &&
+                        column + i < COLUMNS_NUMBER &&
+                        line + j >= 0 &&
+                        line + j < LINES_NUMBER)
                     {
                         if (board[column + i, line + j] == PlayerWhite.ID ||
                             board[column + i, line + j] == PlayerBlack.ID)
@@ -181,24 +210,20 @@ namespace Otello
                             isIsolated = false;
                         }
                     }
-                    catch (Exception)
-                    {
-                        continue;
-                    }
                 }
             }
 
             return isIsolated;
         }
-        
+
         /// <summary>
         /// Check if their are change on all the diagonals of the given disc
         /// </summary>
         /// <param name="line">The indicated line</param>
         /// <param name="column">The indicated column</param>
-        /// <param name="playerID">The player ID</param>
+        /// <param name="isWhite">Is true if white, flase if black</param>
         /// <returns>The list of cases to change if this move is applied on the board</returns>
-        private List<Tuple<int, int>> CheckChangesOnBoard(int line, int column, int playerID)
+        private List<Tuple<int, int>> CheckChangesOnBoard(int line, int column, bool isWhite)
         {
             int[,] incDirections = new int[,]
             {
@@ -220,11 +245,13 @@ namespace Otello
                 {1, 0 }
             };
 
-            int otherPlayer = PlayerWhite.ID;
+            int playerID = PlayerWhite.ID;
+            int otherPlayer = PlayerBlack.ID;
 
-            if(playerID == PlayerWhite.ID)
+            if(!isWhite)
             {
-                otherPlayer = PlayerBlack.ID;
+                playerID = PlayerBlack.ID;
+                otherPlayer = PlayerWhite.ID;
             }
 
             List<Tuple<int, int>> casesToChange = new List<Tuple<int, int>>();
