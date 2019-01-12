@@ -20,55 +20,156 @@ namespace Otello
     /// </summary>
     public partial class MainWindow : Window
     {
-        private bool inConsole = false;
-        private Grid grid;
+        private int sizeCells;
+        private Game game;
+
         private const int COLUMNS = 9;
         private const int ROWS = 7;
 
         public MainWindow()
         {
-            InitializeComponent();
+            game = new Game(false, false);
+        }
 
-            if (inConsole)
+        public void UpdateSize(object sender, RoutedEventArgs e)
+        {
+            sizeCells = (int)Math.Min(layout.ColumnDefinitions[0].ActualWidth / (COLUMNS + 2),
+                                       layout.RowDefinitions[1].ActualHeight / (ROWS + 2));
+            InitGridPosition();
+
+            for (int i = 0; i < gameGrid.ColumnDefinitions.Count; i++)
             {
-                PlayGameInConsole();
+                gameGrid.ColumnDefinitions[i].Width = new GridLength(sizeCells);
             }
-            else
+            for (int j = 0; j < gameGrid.RowDefinitions.Count; j++)
             {
-                PlayGameInInterface();
+                gameGrid.RowDefinitions[j].Height = new GridLength(sizeCells);
             }
+
+            foreach (UIElement child in gameGrid.Children.OfType<Rectangle>())
+            {
+                Rectangle rect = (Rectangle) child;
+                rect.Width = sizeCells - 1;
+                rect.Height = sizeCells - 1;
+            }
+        }
+
+        override
+        protected void OnSourceInitialized(EventArgs args)
+        {
+            sizeCells = (int)Math.Min(layout.ColumnDefinitions[0].ActualWidth / (COLUMNS + 2),
+                                       layout.RowDefinitions[1].ActualHeight / (ROWS + 2));
+            PlayGameInInterface();
         }
 
         private void PlayGameInInterface()
         {
-            grid = new Grid
-            {
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                Width = 450,
-                Height = 350,
-                Background = Brushes.ForestGreen,
-                ShowGridLines = true
-            };
-
-            for (int i = 0; i < COLUMNS; i++)
-            {
-                grid.ColumnDefinitions.Add(new ColumnDefinition());
-            }
-            for (int i = 0; i < ROWS; i++)
-            {
-                grid.RowDefinitions.Add(new RowDefinition());
-            }
-
-            Content = grid;
-
-            //Game game = new Game(true, inConsole);
-            //while (game.GameStart)
-            //{
-                //game.FindNextPossibleMoves();
-                //game.PlayMove(col, line);
-            //}
+            InitGridPosition();
+            InitGridLabels();
+            InitGrid();
+            InitGridDisplay();
         }
+
+        private void InitGridPosition()
+        {
+            int shiftLeft = (int)(layout.ColumnDefinitions[0].ActualWidth - (COLUMNS + 2) * sizeCells) / 2;
+            int shiftTop = (int)(layout.RowDefinitions[1].ActualHeight - (ROWS + 2) * sizeCells) / 2;
+            gameGrid.Margin = new Thickness(shiftLeft, shiftTop, 0, 0);
+        }
+
+        private void InitGridLabels()
+        {
+            // Colonnes
+            char letter = 'A';
+            for (int i = 1; i <= COLUMNS; i++)
+            {
+                ColumnDefinition column = new ColumnDefinition
+                {
+                    Width = new GridLength(sizeCells)
+                };
+                gameGrid.ColumnDefinitions.Add(column);
+
+                Label label = new Label
+                {
+                    Content = letter,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    FontSize = 25
+                };
+
+                Grid.SetColumn(label, i);
+                Grid.SetRow(label, 0);
+                gameGrid.Children.Add(label);
+
+                letter++;
+            }
+
+            // Lignes
+            for (int i = 1; i <= ROWS; i++)
+            {
+                RowDefinition row = new RowDefinition
+                {
+                    Height = new GridLength(sizeCells)
+                };
+                gameGrid.RowDefinitions.Add(row);
+
+                Label label = new Label
+                {
+                    Content = i,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    FontSize = 25
+                };
+
+                Grid.SetColumn(label, 0);
+                Grid.SetRow(label, i);
+                gameGrid.Children.Add(label);
+            }
+        }
+
+        private void InitGrid()
+        {
+            for (int i = 1; i <= COLUMNS; i++)
+            {
+                ColumnDefinition column = new ColumnDefinition
+                {
+                    Width = new GridLength(sizeCells)
+                };
+                gameGrid.ColumnDefinitions.Add(column);
+
+                for (int j = 1; j <= COLUMNS; j++)
+                {
+                    RowDefinition row = new RowDefinition
+                    {
+                        Height = new GridLength(sizeCells)
+                    };
+                    gameGrid.RowDefinitions.Add(row);
+                }
+            }
+        }
+
+        private void InitGridDisplay()
+        {
+            Rectangle rect;
+            for (int i = 1; i <= COLUMNS; i++)
+            {
+                for (int j = 1; j <= ROWS; j++)
+                {
+                    rect = new Rectangle
+                    {
+                        Height = sizeCells - 1,
+                        Width = sizeCells - 1,
+                        Fill = Brushes.Black
+                    };
+
+                    Grid.SetColumn(rect, i);
+                    Grid.SetRow(rect, j);
+
+                    gameGrid.Children.Add(rect);
+                }
+            }
+        }
+        
 
         private void PlayGameInConsole()
         {

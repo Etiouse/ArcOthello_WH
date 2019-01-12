@@ -9,33 +9,34 @@
         Width="800"
         Height="600" 
         MinWidth="800"
-        MinHeight="600">
-    <!--<Grid Margin="80,50,80,50"
-        Background="ForestGreen">
-        <Border BorderBrush="Black"
-                BorderThickness="1">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
-                </Grid.ColumnDefinitions>
-            </Grid>
-        </Border>
-    </Grid> -->
+        MinHeight="600"
+        SizeChanged="UpdateSize">
+    <Grid Name="layout" Grid.Column="0">
+        <!-- Game layout-->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <!-- Data panel-->
+        <Rectangle Grid.Row="0" Fill="Black"></Rectangle>
+        <Rectangle Grid.Row="2" Fill="Black"></Rectangle>
+        <!-- Timer -->
+        <DockPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="135">
+            <Label Grid.Row="0" Content="TIMER" Foreground="#3855b4" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
+        </DockPanel>
+        <!-- Players scores -->
+        <DockPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="20,0,20,0">
+            <Label Grid.Row="0" Content="SCORE 1" Foreground="#3855b4" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
+        </DockPanel>
+        <DockPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,20,0">
+            <Label Grid.Row="0" Content="SCORE 2" Foreground="#3855b4" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
+        </DockPanel>
+        <!-- Grille -->
+        <Rectangle Name="gameBackground" Grid.Row="1" Fill="WHITE"></Rectangle>
+        <Grid Name="gameGrid" Grid.Row="1"></Grid>
+    </Grid>
 </Window>
