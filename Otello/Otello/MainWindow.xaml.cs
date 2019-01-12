@@ -56,8 +56,8 @@ namespace Otello
             foreach (UIElement child in gameGrid.Children.OfType<Ellipse>())
             {
                 Ellipse ellipse = (Ellipse) child;
-                ellipse.Width = sizeCells - 1;
-                ellipse.Height = sizeCells - 1;
+                ellipse.Width = sizeCells - 10;
+                ellipse.Height = sizeCells - 10;
             }
         }
 
