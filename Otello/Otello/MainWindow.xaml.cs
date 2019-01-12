@@ -59,7 +59,8 @@ namespace Otello
         {
             sizeCells = (int)Math.Min(layout.ColumnDefinitions[0].ActualWidth / (COLUMNS + 2),
                                        layout.RowDefinitions[1].ActualHeight / (ROWS + 2));
-            PlayGameInInterface();
+            //PlayGameInInterface();
+            PlayGameInConsole();
         }
 
         private void PlayGameInInterface()

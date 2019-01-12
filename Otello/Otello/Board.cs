@@ -19,8 +19,8 @@ namespace Otello
 
         public Board()
         {
-            PlayerBlack = new Player(PLAYER_BLACK_CASE_ID, "Black player");
-            PlayerWhite = new Player(PLAYER_WHITE_CASE_ID, "White player");
+            PlayerBlack = new Player(PLAYER_BLACK_CASE_ID, "Black player", 0);
+            PlayerWhite = new Player(PLAYER_WHITE_CASE_ID, "White player", 0);
 
             board = new int[COLUMNS_NUMBER, LINES_NUMBER];
 
@@ -262,8 +262,6 @@ namespace Otello
                 List<Tuple<int, int>> casesToChangeInCurrentDirection = new List<Tuple<int, int>>();
                 int currentCol = column + incDirections[i, 1], currentLine = line + incDirections[i, 0];
                 bool isValidCase = true;
-                
-                casesToChangeInCurrentDirection.Add(new Tuple<int, int>(column, line));
 
                 // While the current column and the current line are in the board
                 while (isValidCase &&
@@ -280,7 +278,7 @@ namespace Otello
                     else if (board[currentCol, currentLine] == playerID)
                     {
                         // Doesn't apply changes if the cases to change is only the placed disc or less.
-                        if (casesToChangeInCurrentDirection.Count <= 1)
+                        if (casesToChangeInCurrentDirection.Count <= 0)
                         {
                             isValidCase = false;
                         }
@@ -301,6 +299,11 @@ namespace Otello
                     currentCol += incDirections[i, 1];
                     currentLine += incDirections[i, 0];
                 }
+            }
+
+            if (casesToChange.Count > 0)
+            {
+                casesToChange.Add(new Tuple<int, int>(column, line));
             }
 
             return casesToChange;
