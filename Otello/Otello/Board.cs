@@ -11,9 +11,12 @@ namespace Otello
         private const int EMPTY_CASE_ID = -1;
         private const int PLAYER_BLACK_CASE_ID = 1;
         private const int PLAYER_WHITE_CASE_ID = 0;
+        private string whiteTimeString;
+        private string blackTimeString;
 
         public Player PlayerBlack { get; private set; }
         public Player PlayerWhite { get; private set; }
+
         public int WhiteScore
         {
             get { return PlayerWhite.Score; }
@@ -24,15 +27,35 @@ namespace Otello
             get { return PlayerBlack.Score; }
             set { PlayerBlack.Score = value; RaisePropertyChanged("BlackScore"); }
         }
+
+        public string WhiteTimeString
+        {
+            get { return whiteTimeString; }
+            set { whiteTimeString = value; RaisePropertyChanged("WhiteTimeString"); }
+        }
+        public string BlackTimeString
+        {
+            get { return blackTimeString; }
+            set { blackTimeString = value; RaisePropertyChanged("BlackTimeString"); }
+        }
+
         public TimeSpan WhiteTime
         {
-            get { return new TimeSpan(PlayerWhite.Time.Hours, PlayerWhite.Time.Minutes, PlayerWhite.Time.Seconds); }
-            set { PlayerWhite.Time = value; RaisePropertyChanged("WhiteTime"); }
+            get { return PlayerWhite.Time; }
+            set
+            {
+                PlayerWhite.Time = value;
+                WhiteTimeString = new TimeSpan(PlayerWhite.Time.Hours, PlayerWhite.Time.Minutes, PlayerWhite.Time.Seconds).ToString();
+            }
         }
         public TimeSpan BlackTime
         {
-            get { return new TimeSpan(PlayerBlack.Time.Hours, PlayerBlack.Time.Minutes, PlayerBlack.Time.Seconds); }
-            set { PlayerBlack.Time = value; RaisePropertyChanged("BlackTime"); }
+            get { return PlayerBlack.Time; }
+            set
+            {
+                PlayerBlack.Time = value;
+                BlackTimeString = new TimeSpan(PlayerBlack.Time.Hours, PlayerBlack.Time.Minutes, PlayerBlack.Time.Seconds).ToString();
+            }
         }
 
         void RaisePropertyChanged(string propertyName)
@@ -42,7 +65,6 @@ namespace Otello
         public event PropertyChangedEventHandler PropertyChanged;
 
         private readonly int[,] board;
-        private DateTime dateTime;
 
         public Board()
         {
@@ -50,7 +72,8 @@ namespace Otello
             PlayerWhite = new Player(PLAYER_WHITE_CASE_ID, "White player");
 
             board = new int[COLUMNS_NUMBER, LINES_NUMBER];
-            dateTime = DateTime.Now;
+            whiteTimeString = new TimeSpan(0, 0, 0).ToString();
+            blackTimeString = new TimeSpan(0, 0, 0).ToString();
 
             InitBoard();
         }
@@ -109,22 +132,18 @@ namespace Otello
         public bool PlayMove(int column, int line, bool isWhite)
         {
             List<Tuple<int, int>> casesToChange = CheckChangesOnBoard(line, column, isWhite);
-                
+            
             if(casesToChange.Count > 0)
             {
                 int currentPlayerID;
-                DateTime time = DateTime.Now;
                 if (isWhite)
                 {
                     currentPlayerID = PlayerWhite.ID;
-                    WhiteTime += time - dateTime;
                 }
                 else
                 {
                     currentPlayerID = PlayerBlack.ID;
-                    BlackTime += time - dateTime;
                 }
-                dateTime = time;
 
                 UpdatePlayerScore(currentPlayerID, casesToChange.Count);
 

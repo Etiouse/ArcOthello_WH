@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Otello
 {
@@ -24,11 +25,20 @@ namespace Otello
         private Game game;
         private SolidColorBrush colorWhitePlayer = Brushes.Red;
         private SolidColorBrush colorBlackPlayer = Brushes.Blue;
+        private DispatcherTimer dispatcherTimer;
+        private DateTime lastTime;
 
         public MainWindow()
         {
-            game = new Game(true, false);
+            game = new Game(false, false);
             DataContext = game.Board;
+
+            lastTime = DateTime.Now;
+
+            dispatcherTimer = new DispatcherTimer();
+            dispatcherTimer.Tick += new EventHandler(DispatcherTimer_Tick);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 1);
+            dispatcherTimer.Start();
         }
 
         public void UpdateSize(object sender, RoutedEventArgs e)
@@ -67,6 +77,21 @@ namespace Otello
             sizeCells = (int)Math.Min(layout.ColumnDefinitions[0].ActualWidth / (Board.COLUMNS_NUMBER + 2),
                                        layout.RowDefinitions[1].ActualHeight / (Board.LINES_NUMBER + 2));
             PlayGameInInterface();
+        }
+
+        private void DispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            TimeSpan elapsedTime = DateTime.Now - lastTime;
+            lastTime = DateTime.Now;
+
+            if (game.WhiteTurn)
+            {
+                game.Board.WhiteTime += elapsedTime;
+            }
+            else
+            {
+                game.Board.BlackTime += elapsedTime;
+            }
         }
 
         private void ClickEvent(object sender, MouseButtonEventArgs e)
