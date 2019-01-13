@@ -250,8 +250,19 @@ namespace Otello
 
         private void DrawTokens()
         {
-            int[,] board = game.Board.GetBoard(); 
-            
+            int[,] board = game.Board.GetBoard();
+
+            // Delete all previous tokens
+            for (int i = 0; i < gameGrid.Children.Count; i++)
+            {
+                UIElement child = gameGrid.Children[i];
+                if (child is Ellipse)
+                {
+                    gameGrid.Children.Remove(child);
+                }
+            }
+
+            // Display all tokens
             for (int i = 0; i < board.GetLength(0); i++)
             {
                 for (int j = 0; j < board.GetLength(1); j++)
