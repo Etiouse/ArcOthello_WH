@@ -408,10 +408,10 @@ namespace Otello
             int lineCenter = LINES_NUMBER / 2;
 
             // init board with 4 discs (2 for each player) on the center of the board.
-            board[columnCenter, lineCenter] = PlayerWhite.ID;
-            board[columnCenter + 1, lineCenter + 1] = PlayerWhite.ID;
-            board[columnCenter, lineCenter + 1] = PlayerBlack.ID;
-            board[columnCenter + 1, lineCenter] = PlayerBlack.ID;
+            board[columnCenter, lineCenter] = PlayerBlack.ID;
+            board[columnCenter - 1, lineCenter + 1] = PlayerBlack.ID;
+            board[columnCenter, lineCenter + 1] = PlayerWhite.ID;
+            board[columnCenter - 1, lineCenter] = PlayerWhite.ID;
 
             WhiteScore = 2;
             BlackScore = 2;
