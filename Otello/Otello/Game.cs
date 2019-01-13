@@ -12,7 +12,8 @@ namespace Otello
         public Board Board { get; private set; }
 
         public bool GameStart { get; private set; }
-        public bool WhiteTurn { get; private set; }
+        public bool WhiteTurn { get; set; }
+        public bool TurnSkipped { get; set; }
 
         public SolidColorBrush WhiteColor { get; private set; }
         public SolidColorBrush BlackColor { get; private set; }
@@ -31,6 +32,8 @@ namespace Otello
             WhiteColor = Brushes.Red;
             BlackColor = Brushes.Blue;
             PreviewColor = Brushes.White;
+
+            TurnSkipped = false;
         }
 
         public List<Tuple<int, int>> FindNextPossibleMoves()

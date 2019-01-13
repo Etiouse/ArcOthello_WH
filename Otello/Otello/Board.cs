@@ -192,6 +192,21 @@ namespace Otello
             }
         }
 
+        public bool IsBoardFull()
+        {
+            for (int i = 0; i < LINES_NUMBER; i++)
+            {
+                for (int j = 0; j < COLUMNS_NUMBER; j++)
+                {
+                    if (board[j, i] == EMPTY_CASE_ID)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
         /// <summary>
         /// Check if the case is on the board and if the case is not occupied.
         /// </summary>

@@ -262,7 +262,7 @@ namespace Otello
             List<UIElement> elementsToBeDeleted = new List<UIElement>();
             foreach (UIElement child in gameGrid.Children.OfType<Ellipse>())
             {
-                if (((Ellipse) child).Fill == game.PreviewColor)
+                if (((Ellipse)child).Fill == game.PreviewColor)
                 {
                     elementsToBeDeleted.Add(child);
                 }
@@ -272,31 +272,72 @@ namespace Otello
                 gameGrid.Children.Remove(element);
             }
 
-            // Display possible moves
-            foreach (Tuple<int, int> possibility in possibilities)
-            {
-                Ellipse ellipse = new Ellipse
-                {
-                    Height = sizeCells - 10,
-                    Width = sizeCells - 10,
-                    Fill = game.PreviewColor
-                };
-                
-                Grid.SetColumn(ellipse, possibility.Item1 + 1);
-                Grid.SetRow(ellipse, possibility.Item2 + 1);
-                gameGrid.Children.Add(ellipse);
-            }
-            
             // Update the current player information
             for (int i = 0; i < dataGrid.Children.Count; i++)
             {
                 UIElement element = dataGrid.Children[i];
                 if (Grid.GetRow(element) == 0 && Grid.GetColumn(element) == 2)
                 {
-                    Ellipse rect = (Ellipse) element;
+                    Ellipse rect = (Ellipse)element;
                     rect.Fill = game.CurrentPlayerColor();
                 }
             }
+
+            if (possibilities.Count <= 0)
+            {
+                if (game.Board.IsBoardFull())
+                {
+                    EndGame();
+                }
+                else
+                {
+                    if (game.TurnSkipped)
+                    {
+                        EndGame();
+                    }
+                    else
+                    {
+                        MessageBoxResult result = MessageBox.Show("Le joueur passe son tour, aucun coup n'est valide",
+                            "Informations",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+
+                        if (result == MessageBoxResult.OK)
+                        {
+                            game.TurnSkipped = true;
+                            game.WhiteTurn = !game.WhiteTurn;
+                            DisplayPossibilites();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                game.TurnSkipped = false;
+
+                // Display possible moves
+                foreach (Tuple<int, int> possibility in possibilities)
+                {
+                    Ellipse ellipse = new Ellipse
+                    {
+                        Height = sizeCells - 10,
+                        Width = sizeCells - 10,
+                        Fill = game.PreviewColor
+                    };
+
+                    Grid.SetColumn(ellipse, possibility.Item1 + 1);
+                    Grid.SetRow(ellipse, possibility.Item2 + 1);
+                    gameGrid.Children.Add(ellipse);
+                }
+            }
+        }
+
+        private void EndGame()
+        {
+            MessageBoxResult result = MessageBox.Show("Fin de la partie!",
+                        "Informations",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
         }
 
         private void PlayGameInConsole()
