@@ -8,12 +8,20 @@ namespace Otello
     {
         public const int COLUMNS_NUMBER = 9;
         public const int LINES_NUMBER = 7;
+        
+        private readonly int[,] board;
+
         private const int EMPTY_CASE_ID = -1;
         private const int PLAYER_BLACK_CASE_ID = 1;
         private const int PLAYER_WHITE_CASE_ID = 0;
+        private string whiteTimeString;
+        private string blackTimeString;
 
         public Player PlayerBlack { get; private set; }
         public Player PlayerWhite { get; private set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public int WhiteScore
         {
             get { return PlayerWhite.Score; }
@@ -24,62 +32,127 @@ namespace Otello
             get { return PlayerBlack.Score; }
             set { PlayerBlack.Score = value; RaisePropertyChanged("BlackScore"); }
         }
+
+        public string WhiteTimeString
+        {
+            get { return whiteTimeString; }
+            set { whiteTimeString = value; RaisePropertyChanged("WhiteTimeString"); }
+        }
+        public string BlackTimeString
+        {
+            get { return blackTimeString; }
+            set { blackTimeString = value; RaisePropertyChanged("BlackTimeString"); }
+        }
+
         public TimeSpan WhiteTime
         {
-            get { return new TimeSpan(PlayerWhite.Time.Hours, PlayerWhite.Time.Minutes, PlayerWhite.Time.Seconds); }
-            set { PlayerWhite.Time = value; RaisePropertyChanged("WhiteTime"); }
+            get { return PlayerWhite.Time; }
+            set
+            {
+                PlayerWhite.Time = value;
+                WhiteTimeString = new TimeSpan(PlayerWhite.Time.Hours, PlayerWhite.Time.Minutes, PlayerWhite.Time.Seconds).ToString();
+            }
         }
         public TimeSpan BlackTime
         {
-            get { return new TimeSpan(PlayerBlack.Time.Hours, PlayerBlack.Time.Minutes, PlayerBlack.Time.Seconds); }
-            set { PlayerBlack.Time = value; RaisePropertyChanged("BlackTime"); }
+            get { return PlayerBlack.Time; }
+            set
+            {
+                PlayerBlack.Time = value;
+                BlackTimeString = new TimeSpan(PlayerBlack.Time.Hours, PlayerBlack.Time.Minutes, PlayerBlack.Time.Seconds).ToString();
+            }
         }
 
-        void RaisePropertyChanged(string propertyName)
+        private void RaisePropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly int[,] board;
-        private DateTime dateTime;
-
+        /// <summary>
+        /// Default constructor.
+        /// Init the board.
+        /// </summary>
         public Board()
         {
             PlayerBlack = new Player(PLAYER_BLACK_CASE_ID, "Black player");
             PlayerWhite = new Player(PLAYER_WHITE_CASE_ID, "White player");
 
             board = new int[COLUMNS_NUMBER, LINES_NUMBER];
-            dateTime = DateTime.Now;
+            whiteTimeString = new TimeSpan(0, 0, 0).ToString();
+            blackTimeString = new TimeSpan(0, 0, 0).ToString();
 
             InitBoard();
         }
 
+        /// <summary>
+        /// Returns the number of black tiles
+        /// </summary>
+        /// <returns></returns>
         public int GetBlackScore()
         {
             return PlayerBlack.Score;
         }
 
+        /// <summary>
+        /// Returns the number of white tiles on the board
+        /// </summary>
+        /// <returns></returns>
         public int GetWhiteScore()
         {
             return PlayerWhite.Score;
         }
 
+        /// <summary>
+        /// Returns a reference to a 2D array with the board status
+        /// </summary>
+        /// <returns>The 7x9 tiles status</returns>
         public int[,] GetBoard()
         {
             return board;
         }
 
+        /// <summary>
+        /// Returns the IA's name
+        /// </summary>
+        /// <returns>true or false</returns>
         public string GetName()
         {
             return "IA_WH";
         }
 
+        /// <summary>
+        /// Asks the game engine next (valid) move given a game position
+        /// The board assumes following standard move notation:
+        /// 
+        ///             A B C D E F G H I
+        ///         [ ][0 1 2 3 4 5 6 7 8]     (first index)
+        ///        1 0
+        ///        2 1
+        ///        3 2        X
+        ///        4 3            X
+        ///        5 4
+        ///        6 5
+        ///        7 6
+        ///       
+        ///          Column Line
+        ///  E.g.:    D3, F4 game notation will map to {3,2} resp. {5,3}
+        /// </summary>
+        /// <param name="game">a 2D board with integer values: 0 for white 1 for black and -1 for empty tiles. First index for the column, second index for the line</param>
+        /// <param name="level">an integer value to set the level of the IA, 5 normally</param>
+        /// <param name="whiteTurn">true if white players turn, false otherwise</param>
+        /// <returns>The column and line indices. Will return {-1,-1} as PASS if no possible move </returns>
         public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Returns true if the move is valid for specified color
+        /// </summary>
+        /// <param name="column">value between 0 and 8</param>
+        /// <param name="line">value between 0 and 6</param>
+        /// <param name="isWhite"></param>
+        /// <returns>true or false</returns>
         public bool IsPlayable(int column, int line, bool isWhite)
         {
             // Check if the move is not out of the board and
@@ -106,29 +179,35 @@ namespace Otello
             return true;
         }
 
+        /// <summary>
+        /// Will update the board status if the move is valid and return true
+        /// Will return false otherwise (board is unchanged)
+        /// </summary>
+        /// <param name="column">value between 0 and 8</param>
+        /// <param name="line">value between 0 and 6</param>
+        /// <param name="isWhite">true for white move, false for black move</param>
+        /// <returns></returns>
         public bool PlayMove(int column, int line, bool isWhite)
         {
             List<Tuple<int, int>> casesToChange = CheckChangesOnBoard(line, column, isWhite);
-                
+            
             if(casesToChange.Count > 0)
             {
                 int currentPlayerID;
-                DateTime time = DateTime.Now;
+
                 if (isWhite)
                 {
                     currentPlayerID = PlayerWhite.ID;
-                    WhiteTime += time - dateTime;
                 }
                 else
                 {
                     currentPlayerID = PlayerBlack.ID;
-                    BlackTime += time - dateTime;
                 }
-                dateTime = time;
 
                 UpdatePlayerScore(currentPlayerID, casesToChange.Count);
 
                 ApplyChangesOnBoard(casesToChange, currentPlayerID);
+
                 return true;
             }
 
@@ -404,10 +483,10 @@ namespace Otello
             int lineCenter = LINES_NUMBER / 2;
 
             // init board with 4 discs (2 for each player) on the center of the board.
-            board[columnCenter, lineCenter] = PlayerWhite.ID;
-            board[columnCenter + 1, lineCenter + 1] = PlayerWhite.ID;
-            board[columnCenter, lineCenter + 1] = PlayerBlack.ID;
-            board[columnCenter + 1, lineCenter] = PlayerBlack.ID;
+            board[columnCenter, lineCenter] = PlayerBlack.ID;
+            board[columnCenter - 1, lineCenter + 1] = PlayerBlack.ID;
+            board[columnCenter, lineCenter + 1] = PlayerWhite.ID;
+            board[columnCenter - 1, lineCenter] = PlayerWhite.ID;
 
             WhiteScore = 2;
             BlackScore = 2;
