@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Path = System.IO.Path;
 
 namespace Otello
 {
@@ -75,49 +76,57 @@ namespace Otello
 
         private void CommandBinding_Open(object sender, ExecutedRoutedEventArgs e)
         {
-            if (File.Exists(FILENAME))
+            OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                try
-                {
-                    FileStream readerFileStream = new FileStream(FILENAME, FileMode.Open, FileAccess.Read);
-                    GameModel gameModel = (GameModel) formatter.Deserialize(readerFileStream);
-                    readerFileStream.Close();
+                Filter = "otello board files (*.owh)|*.owh|All files (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
+            
+            if(openFileDialog.ShowDialog() == true)
+            {
+                string fileName = openFileDialog.FileName;
+                var stream = openFileDialog.OpenFile();
 
-                    game.WhiteTurn = gameModel.WhiteTurn;
+                GameModel gameModel = (GameModel)formatter.Deserialize(stream);
+                stream.Close();
 
-                    Board board = game.Board;
-                    board.SetBoard(gameModel.Board);
-                    board.WhiteScore = gameModel.WhiteScore;
-                    board.BlackScore = gameModel.BlackScore;
-                    board.WhiteTime = gameModel.WhiteTime;
-                    board.BlackTime = gameModel.BlackTime;
+                game.WhiteTurn = gameModel.WhiteTurn;
 
-                    ResetGrid();
-                    DrawTokens();
-                    DisplayPossibilites();
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("IO Exception");
-                }
-            } 
+                Board board = game.Board;
+                board.SetBoard(gameModel.Board);
+                board.WhiteScore = gameModel.WhiteScore;
+                board.BlackScore = gameModel.BlackScore;
+                board.WhiteTime = gameModel.WhiteTime;
+                board.BlackTime = gameModel.BlackTime;
+
+                ResetGrid();
+                DrawTokens();
+                DisplayPossibilites();
+            }
         }
 
         private void CommandBinding_Save(object sender, ExecutedRoutedEventArgs e)
         {
             Board board = game.Board;
             GameModel gameModel = new GameModel(board.GetBoard(), board.WhiteScore, board.BlackScore, board.WhiteTime, board.BlackTime, game.WhiteTurn);
-            
-            try
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
             {
-                FileStream writerFileStream = new FileStream(FILENAME, FileMode.Create, FileAccess.Write);
-                formatter.Serialize(writerFileStream, gameModel);
-                writerFileStream.Close();
+                Filter = "otello board files (*.owh)|*.owh|All files (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
+
+            Stream myStream;
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                if ((myStream = saveFileDialog.OpenFile()) != null)
+                {
+                    formatter.Serialize(myStream, gameModel);
+                    myStream.Close();
+                }
             }
-            catch (Exception)
-            {
-                Console.WriteLine("IO Exception :(");
-            } 
         }
 
         public void UpdateSize(object sender, RoutedEventArgs e)
