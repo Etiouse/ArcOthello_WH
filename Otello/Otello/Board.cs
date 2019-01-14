@@ -20,8 +20,6 @@ namespace Otello
         public Player PlayerBlack { get; private set; }
         public Player PlayerWhite { get; private set; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public int WhiteScore
         {
             get { return PlayerWhite.Score; }
@@ -62,6 +60,8 @@ namespace Otello
                 BlackTimeString = new TimeSpan(PlayerBlack.Time.Hours, PlayerBlack.Time.Minutes, PlayerBlack.Time.Seconds).ToString();
             }
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private void RaisePropertyChanged(string propertyName)
         {
@@ -430,14 +430,6 @@ namespace Otello
             {
                 casesToChange.Add(new Tuple<int, int>(column, line));
             }
-
-            Console.WriteLine(new Tuple<int, int>(column, line));
-            for (int i = 0; i < casesToChange.Count; i++)
-            {
-                Console.WriteLine(casesToChange[i]);
-            }
-            Console.WriteLine("------------");
-            Console.Read();
 
             return casesToChange;
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,18 +23,34 @@ namespace Otello
     public partial class MainWindow : Window
     {
         private int sizeCells;
+        private const int TIME_BEFORE_CLEAR_MESSAGE_INFO = 2;
+
+        private bool playerSkipingTurn;
+
         private Game game;
+
         private SolidColorBrush colorWhitePlayer = Brushes.Red;
         private SolidColorBrush colorBlackPlayer = Brushes.Blue;
         private DispatcherTimer dispatcherTimer;
         private DateTime lastTime;
+        private DateTime nextTimeClearMessageInfo;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void RaisePropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public MainWindow()
         {
             game = new Game(false, false);
             DataContext = game.Board;
 
+            nextTimeClearMessageInfo = DateTime.Now;
             lastTime = DateTime.Now;
+
+            playerSkipingTurn = false;
 
             dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += new EventHandler(DispatcherTimer_Tick);
@@ -84,29 +101,46 @@ namespace Otello
             TimeSpan elapsedTime = DateTime.Now - lastTime;
             lastTime = DateTime.Now;
 
-            if (game.WhiteTurn)
+            if (DateTime.Now >= nextTimeClearMessageInfo)
             {
-                game.Board.WhiteTime += elapsedTime;
-            }
-            else
-            {
-                game.Board.BlackTime += elapsedTime;
+                if (playerSkipingTurn)
+                {
+                    messageInfo.Content = "";
+                    playerSkipingTurn = false;
+                    game.TurnSkipped = true;
+                    game.WhiteTurn = !game.WhiteTurn;
+                    DisplayPossibilites();
+                }
+                else
+                {
+                    if (game.WhiteTurn)
+                    {
+                        game.Board.WhiteTime += elapsedTime;
+                    }
+                    else
+                    {
+                        game.Board.BlackTime += elapsedTime;
+                    }
+                }
             }
         }
 
         private void ClickEvent(object sender, MouseButtonEventArgs e)
         {
-            int x = Grid.GetColumn(sender as UIElement) - 1;
-            int y = Grid.GetRow(sender as UIElement) - 1;
-
-            List<Tuple<int, int>> possibilities = game.FindNextPossibleMoves();
-            foreach (Tuple<int, int> possibility in possibilities)
+            if (!playerSkipingTurn)
             {
-                if (possibility.Item1 == x && possibility.Item2 == y)
+                int x = Grid.GetColumn(sender as UIElement) - 1;
+                int y = Grid.GetRow(sender as UIElement) - 1;
+
+                List<Tuple<int, int>> possibilities = game.FindNextPossibleMoves();
+                foreach (Tuple<int, int> possibility in possibilities)
                 {
-                    game.PlayMove(possibility.Item1, possibility.Item2);
-                    DrawTokens();
-                    DisplayPossibilites();
+                    if (possibility.Item1 == x && possibility.Item2 == y)
+                    {
+                        game.PlayMove(possibility.Item1, possibility.Item2);
+                        DrawTokens();
+                        DisplayPossibilites();
+                    }
                 }
             }
         }
@@ -333,17 +367,11 @@ namespace Otello
                     }
                     else
                     {
-                        MessageBoxResult result = MessageBox.Show("Le joueur passe son tour, aucun coup n'est valide",
-                            "Informations",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Information);
+                        messageInfo.Content = "Le joueur passe son tour, aucun coup n'est valide !";
 
-                        if (result == MessageBoxResult.OK)
-                        {
-                            game.TurnSkipped = true;
-                            game.WhiteTurn = !game.WhiteTurn;
-                            DisplayPossibilites();
-                        }
+                        UpdateTimeClearMessageInfo();
+                        
+                        playerSkipingTurn = true;
                     }
                 }
             }
@@ -368,12 +396,16 @@ namespace Otello
             }
         }
 
+        private void UpdateTimeClearMessageInfo()
+        {
+            nextTimeClearMessageInfo = DateTime.Now + new TimeSpan(0, 0, TIME_BEFORE_CLEAR_MESSAGE_INFO);
+        }
+
         private void EndGame()
         {
-            MessageBoxResult result = MessageBox.Show("Fin de la partie!",
-                        "Informations",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
+            messageInfo.Content = "Fin de la partie!";
+
+            dispatcherTimer.Stop();
         }
 
         private void PlayGameInConsole()
