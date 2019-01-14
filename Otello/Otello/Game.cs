@@ -20,6 +20,12 @@ namespace Otello
         public SolidColorBrush WhiteColorPreview { get; private set; }
         public SolidColorBrush BlackColorPreview { get; private set; }
 
+        public Stack<int[,]> PreviousGrid { get; private set; }
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="whiteBegins">True if the white player begins, false if it's the black one</param>
         public Game(bool whiteBegins)
         {
             Board = new Board();
@@ -33,22 +39,33 @@ namespace Otello
             BlackColorPreview = new SolidColorBrush(Color.FromArgb(255, 0, 170, 255));
 
             TurnSkipped = false;
+
+            PreviousGrid = new Stack<int[,]>();
         }
 
+        /// <summary>
+        /// Returns the next possible moves for the current player
+        /// </summary>
+        /// <returns>The next possible moves for the current player</returns>
         public List<Tuple<int, int>> FindNextPossibleMoves()
         {
-            List<Tuple<int, int>> nextPossibleMoves = Board.GetNextPossibleMoves(WhiteTurn);
-
-            return nextPossibleMoves;
+            return Board.GetNextPossibleMoves(WhiteTurn);
         }
 
-        public bool PlayMove(int col, int line)
+        /// <summary>
+        /// Play the given move if it's playable.
+        /// Change the turn if the move is valid
+        /// </summary>
+        /// <param name="column">The given column on the board</param>
+        /// <param name="line">The given line on the board</param>
+        /// <returns>True if the move is valide, false otherwise</returns>
+        public bool PlayMove(int column, int line)
         {
             bool validMove = false;
 
-            if (Board.IsPlayable(col, line, WhiteTurn))
+            if (Board.IsPlayable(column, line, WhiteTurn))
             {
-                validMove = Board.PlayMove(col, line, WhiteTurn);
+                validMove = Board.PlayMove(column, line, WhiteTurn);
             }
 
             if (validMove)

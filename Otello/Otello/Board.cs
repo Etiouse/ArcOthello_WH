@@ -250,6 +250,10 @@ namespace Otello
             return nextPossibleCases;
         }
 
+        /// <summary>
+        /// Check if the board is full
+        /// </summary>
+        /// <returns>True if the board is full, false otherwise</returns>
         public bool IsBoardFull()
         {
             for (int i = 0; i < LINES_NUMBER; i++)
@@ -262,6 +266,7 @@ namespace Otello
                     }
                 }
             }
+
             return true;
         }
 
