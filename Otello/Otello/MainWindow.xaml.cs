@@ -397,7 +397,7 @@ namespace Otello
             List<UIElement> elementsToBeDeleted = new List<UIElement>();
             foreach (UIElement child in gameGrid.Children.OfType<Ellipse>())
             {
-                if (((Ellipse)child).Fill == game.PreviewColor)
+                if (((Ellipse)child).Fill == game.WhiteColorPreview || ((Ellipse)child).Fill == game.BlackColorPreview)
                 {
                     elementsToBeDeleted.Add(child);
                 }
@@ -457,8 +457,18 @@ namespace Otello
                     {
                         Height = sizeCells - 10,
                         Width = sizeCells - 10,
-                        Fill = game.PreviewColor
+                        Stroke = Brushes.White,
+                        StrokeThickness = 5
                     };
+
+                    if (game.WhiteTurn)
+                    {
+                        ellipse.Fill = game.WhiteColorPreview;
+                    }
+                    else
+                    {
+                        ellipse.Fill = game.BlackColorPreview;
+                    }
 
                     Grid.SetColumn(ellipse, possibility.Item1 + 1);
                     Grid.SetRow(ellipse, possibility.Item2 + 1);
