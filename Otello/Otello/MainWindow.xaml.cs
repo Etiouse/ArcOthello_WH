@@ -161,10 +161,15 @@ namespace Otello
 
             if(isFill)
             {
-                game.WhiteTurn = !game.WhiteTurn;
+                messageInfo.Content = "";
+                playerSkipingTurn = false;
+                nextTimeClearMessageInfo = DateTime.Now;
 
+                ResetGrid();
                 DrawTokens();
                 DisplayPossibilites();
+
+                dispatcherTimer.Start();
             }
         }
 

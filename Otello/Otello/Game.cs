@@ -20,7 +20,7 @@ namespace Otello
         public SolidColorBrush WhiteColorPreview { get; private set; }
         public SolidColorBrush BlackColorPreview { get; private set; }
 
-        public Stack<Tuple<int[,], Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>> PreviousTurns { get; set; }
+        public Stack<Tuple<int[,], bool, Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>> PreviousTurns { get; set; }
 
         /// <summary>
         /// Default constructor
@@ -40,7 +40,7 @@ namespace Otello
 
             TurnSkipped = false;
 
-            PreviousTurns = new Stack<Tuple<int[,], Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>>();
+            PreviousTurns = new Stack<Tuple<int[,], bool, Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>>();
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Otello
                 new Tuple<int, int>(Board.PlayerWhite.Score, Board.PlayerBlack.Score);
 
             // Store all infos
-            PreviousTurns.Push(new Tuple<int[,], Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>(copy, playersTime, playersScore));
+            PreviousTurns.Push(new Tuple<int[,], bool, Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>(copy, WhiteTurn, playersTime, playersScore));
         }
 
         /// <summary>
@@ -122,13 +122,17 @@ namespace Otello
         {
             if (PreviousTurns.Count > 0)
             {
-                Tuple<int[,], Tuple<TimeSpan, TimeSpan>, Tuple<int, int>> previousTurn = PreviousTurns.Pop();
+                Tuple<int[,], bool, Tuple<TimeSpan, TimeSpan>, Tuple<int, int>> previousTurn = PreviousTurns.Pop();
 
                 Board.CurrentBoard = previousTurn.Item1;
-                Board.WhiteTime = previousTurn.Item2.Item1;
-                Board.BlackTime = previousTurn.Item2.Item2;
-                Board.WhiteScore = previousTurn.Item3.Item1;
-                Board.BlackScore = previousTurn.Item3.Item2;
+
+                WhiteTurn = previousTurn.Item2;
+
+                Board.WhiteTime = previousTurn.Item3.Item1;
+                Board.BlackTime = previousTurn.Item3.Item2;
+
+                Board.WhiteScore = previousTurn.Item4.Item1;
+                Board.BlackScore = previousTurn.Item4.Item2;
 
                 return true;
             }
