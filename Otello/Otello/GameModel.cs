@@ -15,8 +15,10 @@ namespace Otello
         public TimeSpan WhiteTime { get; private set; }
         public TimeSpan BlackTime { get; private set; }
         public bool WhiteTurn { get; private set; }
+        public Stack<Tuple<int[,], Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>> PreviousTurns { get; private set; }
 
-        public GameModel(int[,] board, int whiteScore, int blackScore, TimeSpan whiteTime, TimeSpan blackTime, bool whiteTurn)
+        public GameModel(int[,] board, int whiteScore, int blackScore, TimeSpan whiteTime, TimeSpan blackTime, bool whiteTurn,
+            Stack<Tuple<int[,], Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>> previousTurns)
         {
             Board = board;
             WhiteScore = whiteScore;
@@ -24,6 +26,7 @@ namespace Otello
             WhiteTime = whiteTime;
             BlackTime = blackTime;
             WhiteTurn = whiteTurn;
+            PreviousTurns = previousTurns;
         }
     }
 }

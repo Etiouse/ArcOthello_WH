@@ -20,7 +20,7 @@ namespace Otello
         public SolidColorBrush WhiteColorPreview { get; private set; }
         public SolidColorBrush BlackColorPreview { get; private set; }
 
-        public Stack<Tuple<int[,], Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>> PreviousTurns { get; private set; }
+        public Stack<Tuple<int[,], Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>> PreviousTurns { get; set; }
 
         /// <summary>
         /// Default constructor
