@@ -88,6 +88,8 @@ namespace Otello
             ResetGrid();
             DrawTokens();
             DisplayPossibilites();
+
+            dispatcherTimer.Start();
         }
 
         private void CommandBinding_Open(object sender, ExecutedRoutedEventArgs e)
@@ -119,6 +121,8 @@ namespace Otello
                 ResetGrid();
                 DrawTokens();
                 DisplayPossibilites();
+
+                dispatcherTimer.Start();
             }
         }
 
