@@ -20,7 +20,7 @@ namespace Otello
         public SolidColorBrush WhiteColorPreview { get; private set; }
         public SolidColorBrush BlackColorPreview { get; private set; }
 
-        public Stack<int[,]> PreviousGrid { get; private set; }
+        public Stack<Tuple<int[,], Tuple<Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>>> PreviousTurn { get; private set; }
 
         /// <summary>
         /// Default constructor
@@ -40,7 +40,7 @@ namespace Otello
 
             TurnSkipped = false;
 
-            PreviousGrid = new Stack<int[,]>();
+            PreviousTurn = new Stack<Tuple<int[,], Tuple<Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>>>();
         }
 
         /// <summary>
@@ -92,6 +92,51 @@ namespace Otello
             {
                 return BlackColor;
             }
+        }
+
+        /// <summary>
+        /// Push all the information for the undo functionnality.
+        /// </summary>
+        public void PushCurrentGridForUndo()
+        {
+            // Deap copy of array
+            int[,] copy = new int[Board.CurrentBoard.GetLength(0), Board.CurrentBoard.GetLength(1)];
+            Array.Copy(Board.CurrentBoard, copy, Board.CurrentBoard.Length);
+
+            // Players time
+            Tuple<TimeSpan, TimeSpan> playersTime =
+                new Tuple<TimeSpan, TimeSpan>(Board.PlayerWhite.Time, Board.PlayerBlack.Time);
+            // Players score
+            Tuple<int, int> playersScore =
+                new Tuple<int, int>(Board.PlayerWhite.Score, Board.PlayerBlack.Score);
+            //Players info
+            Tuple<Tuple<TimeSpan, TimeSpan>, Tuple<int, int>> playersInfo =
+                new Tuple<Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>(playersTime, playersScore);
+
+            // Store all infos
+            PreviousTurn.Push(new Tuple<int[,], Tuple<Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>>(copy, playersInfo));
+        }
+
+        /// <summary>
+        /// Pop and update all the information for the undo functionnality
+        /// </summary>
+        /// <returns>True if the storage contained info, false if empty</returns>
+        public bool PopAndApplyLastPushedGridForUndo()
+        {
+            if (PreviousTurn.Count > 0)
+            {
+                Tuple<int[,], Tuple<Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>> previousTurn = PreviousTurn.Pop();
+
+                Board.CurrentBoard = previousTurn.Item1;
+                Board.WhiteTime = previousTurn.Item2.Item1.Item1;
+                Board.BlackTime = previousTurn.Item2.Item1.Item2;
+                Board.WhiteScore = previousTurn.Item2.Item2.Item1;
+                Board.BlackScore = previousTurn.Item2.Item2.Item2;
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

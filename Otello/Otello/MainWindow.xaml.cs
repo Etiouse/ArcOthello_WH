@@ -149,6 +149,19 @@ namespace Otello
             }
         }
 
+        private void CommandBinding_Undo(object sender, ExecutedRoutedEventArgs e)
+        {
+            bool isFill = game.PopAndApplyLastPushedGridForUndo();
+
+            if(isFill)
+            {
+                game.WhiteTurn = !game.WhiteTurn;
+
+                DrawTokens();
+                DisplayPossibilites();
+            }
+        }
+
         public void UpdateSize(object sender, RoutedEventArgs e)
         {
             sizeCells = (int)Math.Min(layout.ColumnDefinitions[0].ActualWidth / (Board.COLUMNS_NUMBER + 2),
@@ -228,6 +241,7 @@ namespace Otello
                 {
                     if (possibility.Item1 == x && possibility.Item2 == y)
                     {
+                        game.PushCurrentGridForUndo();
                         game.PlayMove(possibility.Item1, possibility.Item2);
                         DrawTokens();
                         DisplayPossibilites();

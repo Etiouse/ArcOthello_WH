@@ -15,6 +15,7 @@
         <CommandBinding Command="New" Executed="CommandBinding_New" />
         <CommandBinding Command="Open" Executed="CommandBinding_Open" />
         <CommandBinding Command="Save" Executed="CommandBinding_Save" />
+        <CommandBinding Command="Undo" Executed="CommandBinding_Undo" />
     </Window.CommandBindings>
     <Grid Name="layout" Grid.Column="0">
         <!-- Game layout-->
@@ -47,6 +48,7 @@
                 <Button Width="80" Command="New" Content="Nouveau" />
                 <Button Width="80" Command="Open" Content="Ouvrir" />
                 <Button Width="80" Command="Save" Content="Enregistrer" />
+                <Button Width="80" Command="Undo" Content="Annuler" />
             </ToolBar>
             <!-- Players scores and timers-->
             <DockPanel Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="20,0,20,0">

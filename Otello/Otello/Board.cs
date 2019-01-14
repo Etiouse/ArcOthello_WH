@@ -9,16 +9,12 @@ namespace Otello
         public const int COLUMNS_NUMBER = 9;
         public const int LINES_NUMBER = 7;
         
-        private int[,] board;
-
-        private const int EMPTY_CASE_ID = -1;
-        private const int PLAYER_BLACK_CASE_ID = 1;
-        private const int PLAYER_WHITE_CASE_ID = 0;
-        private string whiteTimeString;
-        private string blackTimeString;
+        public int[,] CurrentBoard { get; set; }
 
         public Player PlayerBlack { get; private set; }
         public Player PlayerWhite { get; private set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public int WhiteScore
         {
@@ -61,7 +57,11 @@ namespace Otello
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        private const int EMPTY_CASE_ID = -1;
+        private const int PLAYER_BLACK_CASE_ID = 1;
+        private const int PLAYER_WHITE_CASE_ID = 0;
+        private string whiteTimeString;
+        private string blackTimeString;
 
         private void RaisePropertyChanged(string propertyName)
         {
@@ -77,7 +77,7 @@ namespace Otello
             PlayerBlack = new Player(PLAYER_BLACK_CASE_ID, "Black player");
             PlayerWhite = new Player(PLAYER_WHITE_CASE_ID, "White player");
 
-            board = new int[COLUMNS_NUMBER, LINES_NUMBER];
+            CurrentBoard = new int[COLUMNS_NUMBER, LINES_NUMBER];
             whiteTimeString = new TimeSpan(0, 0, 0).ToString();
             blackTimeString = new TimeSpan(0, 0, 0).ToString();
 
@@ -108,12 +108,12 @@ namespace Otello
         /// <returns>The 7x9 tiles status</returns>
         public int[,] GetBoard()
         {
-            return board;
+            return CurrentBoard;
         }
 
         public void SetBoard(int[,] board)
         {
-            this.board = board;
+            this.CurrentBoard = board;
         }
 
         /// <summary>
@@ -232,8 +232,8 @@ namespace Otello
             {
                 for (int line = 0; line < LINES_NUMBER; line++)
                 {
-                    if (board[col, line] != PlayerWhite.ID &&
-                        board[col, line] != PlayerBlack.ID &&
+                    if (CurrentBoard[col, line] != PlayerWhite.ID &&
+                        CurrentBoard[col, line] != PlayerBlack.ID &&
                         CheckUsableCase(col, line) &&
                         !CheckIsolation(col, line))
                     {
@@ -260,7 +260,7 @@ namespace Otello
             {
                 for (int j = 0; j < COLUMNS_NUMBER; j++)
                 {
-                    if (board[j, i] == EMPTY_CASE_ID)
+                    if (CurrentBoard[j, i] == EMPTY_CASE_ID)
                     {
                         return false;
                     }
@@ -282,8 +282,8 @@ namespace Otello
                 column < COLUMNS_NUMBER &&
                 line >= 0 &&
                 line < LINES_NUMBER &&
-                board[column, line] != PlayerWhite.ID &&
-                board[column, line] != PlayerBlack.ID)
+                CurrentBoard[column, line] != PlayerWhite.ID &&
+                CurrentBoard[column, line] != PlayerBlack.ID)
             {
                 return true;
             }
@@ -313,8 +313,8 @@ namespace Otello
                         line + j >= 0 &&
                         line + j < LINES_NUMBER)
                     {
-                        if (board[column + i, line + j] == PlayerWhite.ID ||
-                            board[column + i, line + j] == PlayerBlack.ID)
+                        if (CurrentBoard[column + i, line + j] == PlayerWhite.ID ||
+                            CurrentBoard[column + i, line + j] == PlayerBlack.ID)
                         {
                             isIsolated = false;
                         }
@@ -380,11 +380,11 @@ namespace Otello
                     currentLine < LINES_NUMBER)
                 {
                     // Don't apply change if their is an empty case
-                    if (board[currentCol, currentLine] == EMPTY_CASE_ID)
+                    if (CurrentBoard[currentCol, currentLine] == EMPTY_CASE_ID)
                     {
                         isValidCase = false;
                     }
-                    else if (board[currentCol, currentLine] == playerID)
+                    else if (CurrentBoard[currentCol, currentLine] == playerID)
                     {
                         // Doesn't apply changes if the cases to change is only the placed disc or less.
                         if (casesToChangeInCurrentDirection.Count > 0)
@@ -394,7 +394,7 @@ namespace Otello
 
                         isValidCase = false;
                     }
-                    else if(board[currentCol, currentLine] == otherPlayer)
+                    else if(CurrentBoard[currentCol, currentLine] == otherPlayer)
                     {
                         casesToChangeInCurrentDirection.Add(new Tuple<int, int>(currentCol, currentLine));
                     }
@@ -446,7 +446,7 @@ namespace Otello
         {
             foreach (Tuple<int, int> item in casesToChange)
             {
-                board[item.Item1, item.Item2] = playerID;
+                CurrentBoard[item.Item1, item.Item2] = playerID;
             }
         }
 
@@ -459,7 +459,7 @@ namespace Otello
             {
                 for (int j = 0; j < LINES_NUMBER; j++)
                 {
-                    board[i, j] = EMPTY_CASE_ID;
+                    CurrentBoard[i, j] = EMPTY_CASE_ID;
                 }
             }
 
@@ -467,10 +467,10 @@ namespace Otello
             int lineCenter = LINES_NUMBER / 2;
 
             // init board with 4 discs (2 for each player) on the center of the board.
-            board[columnCenter, lineCenter] = PlayerBlack.ID;
-            board[columnCenter - 1, lineCenter + 1] = PlayerBlack.ID;
-            board[columnCenter, lineCenter + 1] = PlayerWhite.ID;
-            board[columnCenter - 1, lineCenter] = PlayerWhite.ID;
+            CurrentBoard[columnCenter, lineCenter] = PlayerBlack.ID;
+            CurrentBoard[columnCenter - 1, lineCenter + 1] = PlayerBlack.ID;
+            CurrentBoard[columnCenter, lineCenter + 1] = PlayerWhite.ID;
+            CurrentBoard[columnCenter - 1, lineCenter] = PlayerWhite.ID;
 
             WhiteScore = 2;
             BlackScore = 2;
