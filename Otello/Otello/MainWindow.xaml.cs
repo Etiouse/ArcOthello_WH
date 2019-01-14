@@ -488,7 +488,17 @@ namespace Otello
                     }
                     else
                     {
-                        messageInfo.Content = "Le joueur passe son tour, aucun coup n'est valide !";
+                        string playerName;
+                        if (game.WhiteTurn)
+                        {
+                            playerName = game.Board.PlayerWhite.Name;
+                        }
+                        else
+                        {
+                            playerName = game.Board.PlayerBlack.Name;
+                        }
+
+                        messageInfo.Content = "Le joueur " + playerName + " passe son tour, aucun coup possible !";
 
                         UpdateTimeClearMessageInfo();
                         
@@ -510,7 +520,7 @@ namespace Otello
                         Stroke = Brushes.White,
                         StrokeThickness = 5
                     };
-
+                    
                     if (game.WhiteTurn)
                     {
                         ellipse.Fill = game.WhiteColorPreview;
@@ -540,7 +550,18 @@ namespace Otello
         /// </summary>
         private void EndGame()
         {
-            messageInfo.Content = "Fin de la partie!";
+            if (game.Board.PlayerWhite.Score > game.Board.PlayerBlack.Score)
+            {
+                messageInfo.Content = "Le joueur " + game.Board.PlayerWhite.Name + " à gagné !";
+            }
+            else if (game.Board.PlayerWhite.Score < game.Board.PlayerBlack.Score)
+            {
+                messageInfo.Content = "Le joueur " + game.Board.PlayerBlack.Name + " à gagné !";
+            }
+            else
+            {
+                messageInfo.Content = "Égalité !";
+            }
 
             dispatcherTimer.Stop();
         }

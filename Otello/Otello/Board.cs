@@ -74,8 +74,8 @@ namespace Otello
         /// </summary>
         public Board()
         {
-            PlayerBlack = new Player(PLAYER_BLACK_CASE_ID, "Black player");
-            PlayerWhite = new Player(PLAYER_WHITE_CASE_ID, "White player");
+            PlayerBlack = new Player(PLAYER_BLACK_CASE_ID, "noir");
+            PlayerWhite = new Player(PLAYER_WHITE_CASE_ID, "blanc");
 
             CurrentBoard = new int[COLUMNS_NUMBER, LINES_NUMBER];
             whiteTimeString = new TimeSpan(0, 0, 0).ToString();
