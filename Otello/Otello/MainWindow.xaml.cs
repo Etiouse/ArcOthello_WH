@@ -110,6 +110,7 @@ namespace Otello
                 stream.Close();
 
                 game.WhiteTurn = gameModel.WhiteTurn;
+                game.PreviousTurns = gameModel.PreviousTurns;
 
                 Board board = game.Board;
                 board.SetBoard(gameModel.Board);
@@ -129,7 +130,7 @@ namespace Otello
         private void CommandBinding_Save(object sender, ExecutedRoutedEventArgs e)
         {
             Board board = game.Board;
-            GameModel gameModel = new GameModel(board.GetBoard(), board.WhiteScore, board.BlackScore, board.WhiteTime, board.BlackTime, game.WhiteTurn);
+            GameModel gameModel = new GameModel(board.GetBoard(), board.WhiteScore, board.BlackScore, board.WhiteTime, board.BlackTime, game.WhiteTurn, game.PreviousTurns);
 
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
