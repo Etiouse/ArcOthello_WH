@@ -17,7 +17,8 @@ namespace Otello
 
         public SolidColorBrush WhiteColor { get; private set; }
         public SolidColorBrush BlackColor { get; private set; }
-        public SolidColorBrush PreviewColor { get; private set; }
+        public SolidColorBrush WhiteColorPreview { get; private set; }
+        public SolidColorBrush BlackColorPreview { get; private set; }
 
         public Game(bool whiteBegins)
         {
@@ -28,7 +29,8 @@ namespace Otello
             GameStart = true;
             WhiteColor = Brushes.Red;
             BlackColor = Brushes.Blue;
-            PreviewColor = Brushes.White;
+            WhiteColorPreview = new SolidColorBrush(Color.FromArgb(255, 255, 65, 105));
+            BlackColorPreview = new SolidColorBrush(Color.FromArgb(255, 0, 170, 255));
 
             TurnSkipped = false;
         }

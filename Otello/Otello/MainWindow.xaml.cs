@@ -1,19 +1,17 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Path = System.IO.Path;
 
 namespace Otello
 {
@@ -35,6 +33,8 @@ namespace Otello
         private DateTime lastTime;
         private DateTime nextTimeClearMessageInfo;
 
+        private BinaryFormatter formatter;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void RaisePropertyChanged(string propertyName)
@@ -44,8 +44,10 @@ namespace Otello
 
         public MainWindow()
         {
-            game = new Game(false, false);
+            game = new Game(false);
             DataContext = game.Board;
+
+            formatter = new BinaryFormatter();
 
             nextTimeClearMessageInfo = DateTime.Now;
             lastTime = DateTime.Now;
@@ -56,6 +58,91 @@ namespace Otello
             dispatcherTimer.Tick += new EventHandler(DispatcherTimer_Tick);
             dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 1);
             dispatcherTimer.Start();
+        }
+
+        // Custom overflow for the toolbar
+        private void ToolBar_Loaded(object sender, RoutedEventArgs e)
+        {
+            ToolBar toolBar = sender as ToolBar;
+            if (toolBar.Template.FindName("OverflowGrid", toolBar) is FrameworkElement overflowGrid)
+            {
+                overflowGrid.Visibility = Visibility.Collapsed;
+            }
+            if (toolBar.Template.FindName("MainPanelBorder", toolBar) is FrameworkElement mainPanelBorder)
+            {
+                mainPanelBorder.Margin = new Thickness();
+            }
+        }
+
+        private void CommandBinding_New(object sender, ExecutedRoutedEventArgs e)
+        {
+            game.WhiteTurn = false;
+
+            Board board = game.Board;
+            board.InitBoard();
+            board.WhiteScore = 2;
+            board.BlackScore = 2;
+            board.WhiteTime = new TimeSpan(0, 0, 0);
+            board.BlackTime = new TimeSpan(0, 0, 0);
+
+            ResetGrid();
+            DrawTokens();
+            DisplayPossibilites();
+        }
+
+        private void CommandBinding_Open(object sender, ExecutedRoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "otello board files (*.owh)|*.owh|All files (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
+            
+            if(openFileDialog.ShowDialog() == true)
+            {
+                string fileName = openFileDialog.FileName;
+                var stream = openFileDialog.OpenFile();
+
+                GameModel gameModel = (GameModel)formatter.Deserialize(stream);
+                stream.Close();
+
+                game.WhiteTurn = gameModel.WhiteTurn;
+
+                Board board = game.Board;
+                board.SetBoard(gameModel.Board);
+                board.WhiteScore = gameModel.WhiteScore;
+                board.BlackScore = gameModel.BlackScore;
+                board.WhiteTime = gameModel.WhiteTime;
+                board.BlackTime = gameModel.BlackTime;
+
+                ResetGrid();
+                DrawTokens();
+                DisplayPossibilites();
+            }
+        }
+
+        private void CommandBinding_Save(object sender, ExecutedRoutedEventArgs e)
+        {
+            Board board = game.Board;
+            GameModel gameModel = new GameModel(board.GetBoard(), board.WhiteScore, board.BlackScore, board.WhiteTime, board.BlackTime, game.WhiteTurn);
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "otello board files (*.owh)|*.owh|All files (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
+
+            Stream myStream;
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                if ((myStream = saveFileDialog.OpenFile()) != null)
+                {
+                    formatter.Serialize(myStream, gameModel);
+                    myStream.Close();
+                }
+            }
         }
 
         public void UpdateSize(object sender, RoutedEventArgs e)
@@ -273,13 +360,24 @@ namespace Otello
 
             Ellipse ellipse = new Ellipse
             {
-                Height = dataGrid.RowDefinitions[0].ActualHeight - 20,
-                Width = dataGrid.RowDefinitions[0].ActualHeight - 20,
+                Height = dataGrid.RowDefinitions[1].ActualHeight - 20,
+                Width = dataGrid.RowDefinitions[1].ActualHeight - 20,
                 Fill = colorWhitePlayer
             };
             Grid.SetColumn(ellipse, 2);
-            Grid.SetRow(ellipse, 0);
+            Grid.SetRow(ellipse, 1);
             dataGrid.Children.Add(ellipse);
+        }
+
+        private void ResetGrid()
+        {
+            for (int i = gameGrid.Children.Count - 1; i >= 0; i--)
+            {
+                if (gameGrid.Children[i] is Ellipse)
+                {
+                    gameGrid.Children.RemoveAt(i);
+                }
+            }
         }
 
         private void DrawTokens()
@@ -332,7 +430,7 @@ namespace Otello
             List<UIElement> elementsToBeDeleted = new List<UIElement>();
             foreach (UIElement child in gameGrid.Children.OfType<Ellipse>())
             {
-                if (((Ellipse)child).Fill == game.PreviewColor)
+                if (((Ellipse)child).Fill == game.WhiteColorPreview || ((Ellipse)child).Fill == game.BlackColorPreview)
                 {
                     elementsToBeDeleted.Add(child);
                 }
@@ -346,7 +444,7 @@ namespace Otello
             for (int i = 0; i < dataGrid.Children.Count; i++)
             {
                 UIElement element = dataGrid.Children[i];
-                if (Grid.GetRow(element) == 0 && Grid.GetColumn(element) == 2)
+                if (Grid.GetRow(element) == 1 && Grid.GetColumn(element) == 2)
                 {
                     Ellipse rect = (Ellipse)element;
                     rect.Fill = game.CurrentPlayerColor();
@@ -386,8 +484,18 @@ namespace Otello
                     {
                         Height = sizeCells - 10,
                         Width = sizeCells - 10,
-                        Fill = game.PreviewColor
+                        Stroke = Brushes.White,
+                        StrokeThickness = 5
                     };
+
+                    if (game.WhiteTurn)
+                    {
+                        ellipse.Fill = game.WhiteColorPreview;
+                    }
+                    else
+                    {
+                        ellipse.Fill = game.BlackColorPreview;
+                    }
 
                     Grid.SetColumn(ellipse, possibility.Item1 + 1);
                     Grid.SetRow(ellipse, possibility.Item2 + 1);
