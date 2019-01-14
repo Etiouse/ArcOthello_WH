@@ -156,7 +156,7 @@ namespace Otello
         /// <param name="e"></param>
         private void CommandBinding_Undo(object sender, ExecutedRoutedEventArgs e)
         {
-            bool isFill = game.PopAndApplyLastPushedGridForUndo();
+            bool isFill = game.PopAndApplyLastPushedTurnForUndo();
 
             if(isFill)
             {
@@ -246,7 +246,7 @@ namespace Otello
                 {
                     if (possibility.Item1 == x && possibility.Item2 == y)
                     {
-                        game.PushCurrentGridForUndo();
+                        game.PushCurrentTurnForUndo();
                         game.PlayMove(possibility.Item1, possibility.Item2);
                         DrawTokens();
                         DisplayPossibilites();
