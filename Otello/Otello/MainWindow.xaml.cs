@@ -149,6 +149,11 @@ namespace Otello
             }
         }
 
+        /// <summary>
+        /// Undo a turn if possible.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CommandBinding_Undo(object sender, ExecutedRoutedEventArgs e)
         {
             bool isFill = game.PopAndApplyLastPushedGridForUndo();
