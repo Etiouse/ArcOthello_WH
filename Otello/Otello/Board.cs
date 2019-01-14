@@ -9,7 +9,7 @@ namespace Otello
         public const int COLUMNS_NUMBER = 9;
         public const int LINES_NUMBER = 7;
         
-        private readonly int[,] board;
+        private int[,] board;
 
         private const int EMPTY_CASE_ID = -1;
         private const int PLAYER_BLACK_CASE_ID = 1;
@@ -109,6 +109,11 @@ namespace Otello
         public int[,] GetBoard()
         {
             return board;
+        }
+
+        public void SetBoard(int[,] board)
+        {
+            this.board = board;
         }
 
         /// <summary>
@@ -431,14 +436,6 @@ namespace Otello
                 casesToChange.Add(new Tuple<int, int>(column, line));
             }
 
-            Console.WriteLine(new Tuple<int, int>(column, line));
-            for (int i = 0; i < casesToChange.Count; i++)
-            {
-                Console.WriteLine(casesToChange[i]);
-            }
-            Console.WriteLine("------------");
-            Console.Read();
-
             return casesToChange;
         }
 
@@ -477,7 +474,7 @@ namespace Otello
         /// <summary>
         /// Fill the board with init discs (4 in the center).
         /// </summary>
-        private void InitBoard()
+        public void InitBoard()
         {
             for (int i = 0; i < COLUMNS_NUMBER; i++)
             {
