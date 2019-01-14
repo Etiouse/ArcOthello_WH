@@ -38,9 +38,7 @@ namespace Otello
 
         public List<Tuple<int, int>> FindNextPossibleMoves()
         {
-            List<Tuple<int, int>> nextPossibleMoves;
-            
-            nextPossibleMoves = Board.GetNextPossibleMoves(WhiteTurn);
+            List<Tuple<int, int>> nextPossibleMoves = Board.GetNextPossibleMoves(WhiteTurn);
 
             if(writeInConsole)
             {

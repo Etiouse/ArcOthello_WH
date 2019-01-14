@@ -403,14 +403,12 @@ namespace Otello
                     else if (board[currentCol, currentLine] == playerID)
                     {
                         // Doesn't apply changes if the cases to change is only the placed disc or less.
-                        if (casesToChangeInCurrentDirection.Count <= 0)
-                        {
-                            isValidCase = false;
-                        }
-                        else
+                        if (casesToChangeInCurrentDirection.Count > 0)
                         {
                             casesToChange.AddRange(casesToChangeInCurrentDirection);
                         }
+
+                        isValidCase = false;
                     }
                     else if(board[currentCol, currentLine] == otherPlayer)
                     {
@@ -424,12 +422,22 @@ namespace Otello
                     currentCol += incDirections[i, 1];
                     currentLine += incDirections[i, 0];
                 }
+
+                casesToChangeInCurrentDirection.Clear();
             }
 
             if (casesToChange.Count > 0)
             {
                 casesToChange.Add(new Tuple<int, int>(column, line));
             }
+
+            Console.WriteLine(new Tuple<int, int>(column, line));
+            for (int i = 0; i < casesToChange.Count; i++)
+            {
+                Console.WriteLine(casesToChange[i]);
+            }
+            Console.WriteLine("------------");
+            Console.Read();
 
             return casesToChange;
         }
