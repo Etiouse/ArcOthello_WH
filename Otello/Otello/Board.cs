@@ -245,32 +245,6 @@ namespace Otello
             return nextPossibleCases;
         }
 
-        /// <summary>
-        /// Display the current board in console
-        /// </summary>
-        public void DisplayBoardInConsole()
-        {
-            Console.Write("\t");
-
-            for (int i = 0; i < COLUMNS_NUMBER; i++)
-            {
-                Console.Write(i + "\t");
-            }
-
-            Console.WriteLine();
-
-            for (int i = 0; i < LINES_NUMBER; i++)
-            {
-                Console.Write(i + "\t");
-
-                for (int j = 0; j < COLUMNS_NUMBER; j++)
-                {
-                    Console.Write(board[j, i] + "\t");
-                }
-                Console.WriteLine();
-            }
-        }
-
         public bool IsBoardFull()
         {
             for (int i = 0; i < LINES_NUMBER; i++)

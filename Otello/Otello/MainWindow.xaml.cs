@@ -396,40 +396,22 @@ namespace Otello
             }
         }
 
+        /// <summary>
+        /// Update the next time when the message info label will be clear.
+        /// </summary>
         private void UpdateTimeClearMessageInfo()
         {
             nextTimeClearMessageInfo = DateTime.Now + new TimeSpan(0, 0, TIME_BEFORE_CLEAR_MESSAGE_INFO);
         }
 
+        /// <summary>
+        /// Display the end message and stop the time.
+        /// </summary>
         private void EndGame()
         {
             messageInfo.Content = "Fin de la partie!";
 
             dispatcherTimer.Stop();
-        }
-
-        private void PlayGameInConsole()
-        {
-            Game game = new Game(false, true);
-
-            ConsoleManager.Show();
-
-            Console.WriteLine("Welcome in Otello WH !");
-            Console.WriteLine("Board size : " + Board.COLUMNS_NUMBER + "x" + Board.LINES_NUMBER);
-            game.Board.DisplayBoardInConsole();
-
-            while (game.GameStart)
-            {
-                Console.WriteLine(game.CurrentPlayerColor() + " turn !");
-                Console.WriteLine("Case you want to play in (format : column line)");
-                game.FindNextPossibleMoves();
-
-                string[] newCase = Console.ReadLine().Split(' ');
-                int col = int.Parse(newCase[0]);
-                int line = int.Parse(newCase[1]);
-
-                game.PlayMove(col, line);
-            }
         }
     }
 }

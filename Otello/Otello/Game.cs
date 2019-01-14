@@ -19,14 +19,11 @@ namespace Otello
         public SolidColorBrush BlackColor { get; private set; }
         public SolidColorBrush PreviewColor { get; private set; }
 
-        private readonly bool writeInConsole;
-
-        public Game(bool whiteBegins, bool writeInConsole)
+        public Game(bool whiteBegins)
         {
             Board = new Board();
 
             WhiteTurn = whiteBegins;
-            this.writeInConsole = writeInConsole;
 
             GameStart = true;
             WhiteColor = Brushes.Red;
@@ -39,15 +36,6 @@ namespace Otello
         public List<Tuple<int, int>> FindNextPossibleMoves()
         {
             List<Tuple<int, int>> nextPossibleMoves = Board.GetNextPossibleMoves(WhiteTurn);
-
-            if(writeInConsole)
-            {
-                Console.WriteLine("Next possible moves : ");
-                foreach (Tuple<int, int> nextPossibleMove in nextPossibleMoves)
-                {
-                    Console.WriteLine("( " + nextPossibleMove.Item1 + " ; " + nextPossibleMove.Item2 + " )");
-                }
-            }
 
             return nextPossibleMoves;
         }
@@ -65,22 +53,7 @@ namespace Otello
             {
                 WhiteTurn = !WhiteTurn;
 
-                if (writeInConsole)
-                {
-                    Console.WriteLine(Board.PlayerWhite.Name + " : " + Board.PlayerWhite.Score + " | " + Board.PlayerBlack.Name + " : " + Board.PlayerBlack.Score);
-                    Console.WriteLine("New board state :");
-                    Board.DisplayBoardInConsole();
-                }
-
                 return true;
-            }
-            else
-            {
-                if (writeInConsole)
-                {
-                    Console.WriteLine("Not a valid case !");
-                    Board.DisplayBoardInConsole();
-                }
             }
 
             return false;
