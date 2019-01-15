@@ -8,13 +8,13 @@ namespace Otello
 {
     class IANode
     {
-        public List<int[,]> BoardStates { get; set; }
-        public float Value { get; set; }
+        public int[,] LocalBoard { get; set; }
+        public List<Tuple<int, int>> Moves { get; set; }
 
-        public IANode(List<int[,]> boardStates, float value)
+        public IANode(int[,] board, List<Tuple<int, int>> moves)
         {
-            BoardStates = new List<int[,]>(boardStates);
-            Value = value;
+            LocalBoard = Board.DeapCopyIntArray(board);
+            Moves = moves;
         }
 
         /// <summary>
@@ -38,12 +38,20 @@ namespace Otello
         /// <summary>
         /// Applies the board state to this node and return the new node
         /// </summary>
-        /// <param name="boardState">The new board state</param>
+        /// <param name="move">The move to apply to the board</param>
         /// <returns>The new node if this board state</returns>
-        public IANode Apply(int[,] boardState)
+        public IANode Apply(Tuple<int, int> move, Board board, bool whiteTurn)
         {
-            IANode node = new IANode(BoardStates, Value);
-            node.BoardStates.Add(boardState);
+            board.CurrentBoard = Board.DeapCopyIntArray(LocalBoard);
+            bool isPlayable = board.IsPlayable(move.Item1, move.Item2, whiteTurn);
+            IANode node = null;
+
+            if (isPlayable)
+            {
+                board.PlayMove(move.Item1, move.Item2, whiteTurn);
+
+                node = new IANode(board.CurrentBoard, board.GetNextPossibleMoves(!whiteTurn));
+            }
 
             return node;
         }

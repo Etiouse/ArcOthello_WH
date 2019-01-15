@@ -85,6 +85,19 @@ namespace Otello
         }
 
         /// <summary>
+        /// Deap copy an array of int and return it
+        /// </summary>
+        /// <param name="original">The original array of int that will be copied</param>
+        /// <returns>The copied array of int</returns>
+        public static int[,] DeapCopyIntArray(int[,] original)
+        {
+            int[,] copy = new int[original.GetLength(0), original.GetLength(1)];
+            Array.Copy(original, copy, original.Length);
+
+            return copy;
+        }
+
+        /// <summary>
         /// Returns the number of black tiles
         /// </summary>
         /// <returns></returns>
@@ -143,7 +156,11 @@ namespace Otello
         /// <returns>The column and line indices. Will return {-1,-1} as PASS if no possible move </returns>
         public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
         {
-            throw new NotImplementedException();
+            List<Tuple<int, int>> pos = GetNextPossibleMoves(whiteTurn);
+
+            Tuple<int, int> nextMove = AlphaBeta(new IANode(CurrentBoard, pos), level, 1, whiteTurn).Item2;
+
+            return nextMove;
         }
 
         /// <summary>
@@ -263,6 +280,77 @@ namespace Otello
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Display the current board in console
+        /// </summary>
+        public void DisplayBoardInConsole()
+        {
+            Console.Write("\t");
+
+            for (int i = 0; i < COLUMNS_NUMBER; i++)
+            {
+                Console.Write(i + "\t");
+            }
+
+            Console.WriteLine();
+
+            for (int i = 0; i < LINES_NUMBER; i++)
+            {
+                Console.Write(i + "\t");
+
+                for (int j = 0; j < COLUMNS_NUMBER; j++)
+                {
+                    Console.Write(CurrentBoard[j, i] + "\t");
+                }
+                Console.WriteLine();
+            }
+        }
+
+        /// <summary>
+        /// Find the next node to play for the IA with the alpha beta algorithme
+        /// Based on the given pseudo code (IA course).
+        /// </summary>
+        /// <param name="node">The root node</param>
+        /// <param name="depth">The depth of the algorithm in the tree</param>
+        /// <param name="minOrMax">Maximize = 1, Minimize = -1</param>
+        /// <param name="parentVal">The parent value, first call +infinity to maximize, -infinity to minimize</param>
+        /// <returns>The winner node</returns>
+        private Tuple<float, Tuple<int, int>> AlphaBeta(IANode node, int depth, int minOrMax, bool whiteTurn, float parentVal = float.MaxValue)
+        {
+            // If depth 0 is reached or if the game is finished (TODO)
+            if(depth == 0 || false)
+            {
+                return new Tuple<float, Tuple<int, int>>(node.Eval(), null);
+            }
+
+            float currentVal = minOrMax * float.MinValue;
+            Tuple<int, int> currentMove = null;
+
+            // Check for all possible move on the current board
+            foreach (Tuple<int, int> move in node.Moves)
+            {
+                // Apply the current move and create a new node with it
+                IANode newNode = node.Apply(move, new Board(), whiteTurn);
+
+                // Recursiv call of AlphaBeta with changes
+                Tuple<float, Tuple<int, int>> res = AlphaBeta(newNode, depth - 1, -minOrMax, !whiteTurn, currentVal);
+
+                // Test if the new node of the parent node has a best value
+                if (res.Item1 * minOrMax > currentVal * minOrMax)
+                {
+                    currentVal = res.Item1;
+                    currentMove = new Tuple<int, int>(move.Item1, move.Item2);
+                    
+                    if (currentVal * minOrMax > parentVal * minOrMax)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return new Tuple<float, Tuple<int, int>>(currentVal, currentMove);
         }
 
         /// <summary>
