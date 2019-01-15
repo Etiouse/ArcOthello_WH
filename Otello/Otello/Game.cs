@@ -10,11 +10,12 @@ namespace Otello
 {
     class Game
     {
-        public Board Board { get; private set; }
+        public Board BoardGame { get; private set; }
 
         public bool GameStart { get; private set; }
         public bool WhiteTurn { get; set; }
         public bool TurnSkipped { get; set; }
+        private bool PlayAgainsIA { get; set; }
 
         public ImageBrush WhiteColor { get; private set; }
         public ImageBrush BlackColor { get; private set; }
@@ -27,11 +28,13 @@ namespace Otello
         /// Default constructor
         /// </summary>
         /// <param name="whiteBegins">True if the white player begins, false if it's the black one</param>
-        public Game(bool whiteBegins)
+        /// <param name="playAgainsIA">True if the player plays agains the IA</param>
+        public Game(bool whiteBegins, bool playAgainsIA = false)
         {
-            Board = new Board();
+            BoardGame = new Board();
 
             WhiteTurn = whiteBegins;
+            PlayAgainsIA = playAgainsIA;
 
             ImageBrush whiteBrush = new ImageBrush
             {
@@ -69,7 +72,7 @@ namespace Otello
         /// <returns>The next possible moves for the current player</returns>
         public List<Tuple<int, int>> FindNextPossibleMoves()
         {
-            return Board.GetNextPossibleMoves(WhiteTurn);
+            return BoardGame.GetNextPossibleMoves(WhiteTurn);
         }
 
         /// <summary>
@@ -81,18 +84,64 @@ namespace Otello
         /// <returns>True if the move is valide, false otherwise</returns>
         public bool PlayMove(int column, int line)
         {
-            bool validMove = false;
-
-            if (Board.IsPlayable(column, line, WhiteTurn))
+            if (!PlayAgainsIA ||
+                (PlayAgainsIA && !WhiteTurn))
             {
-                validMove = Board.PlayMove(column, line, WhiteTurn);
+                bool validMove = false;
+
+                if (BoardGame.IsPlayable(column, line, WhiteTurn))
+                {
+                    validMove = BoardGame.PlayMove(column, line, WhiteTurn);
+                }
+
+                if (validMove)
+                {
+                    WhiteTurn = !WhiteTurn;
+                }
+
+                return validMove;
             }
 
-            if (validMove)
-            {
-                WhiteTurn = !WhiteTurn;
+            return false;
+        }
 
-                return true;
+        /// <summary>
+        /// Play the next move for the IA.
+        /// </summary>
+        /// <returns>True if the move is valide, false otherwise</returns>
+        public bool PlayMoveIA()
+        {
+            if (PlayAgainsIA && WhiteTurn)
+            {
+                bool validMove = false;
+                int column, line;
+
+                // TODO needs to be cleaned and improved, meaby moved ? IA's turn
+                Tuple<int, int> nextMove = BoardGame.GetNextMove(BoardGame.CurrentBoard, 5, WhiteTurn);
+                Console.WriteLine(nextMove);
+                Console.Read();
+                column = nextMove.Item1;
+                line = nextMove.Item2;
+
+                // TODO Temp just to ignore the IA's turn if failed
+                if (nextMove == null)
+                {
+                    Console.WriteLine("No next move for the IA");
+                    Console.Read();
+                    return true;
+                }
+
+                if (BoardGame.IsPlayable(column, line, WhiteTurn))
+                {
+                    validMove = BoardGame.PlayMove(column, line, WhiteTurn);
+                }
+
+                if (validMove)
+                {
+                    WhiteTurn = !WhiteTurn;
+                }
+
+                return validMove;
             }
 
             return false;
@@ -120,15 +169,14 @@ namespace Otello
         public void PushCurrentTurnForUndo()
         {
             // Deap copy of array
-            int[,] copy = new int[Board.CurrentBoard.GetLength(0), Board.CurrentBoard.GetLength(1)];
-            Array.Copy(Board.CurrentBoard, copy, Board.CurrentBoard.Length);
+            int[,] copy = Board.DeapCopyIntArray(BoardGame.CurrentBoard);
 
             // Players time
             Tuple<TimeSpan, TimeSpan> playersTime =
-                new Tuple<TimeSpan, TimeSpan>(Board.PlayerWhite.Time, Board.PlayerBlack.Time);
+                new Tuple<TimeSpan, TimeSpan>(BoardGame.PlayerWhite.Time, BoardGame.PlayerBlack.Time);
             // Players score
             Tuple<int, int> playersScore =
-                new Tuple<int, int>(Board.PlayerWhite.Score, Board.PlayerBlack.Score);
+                new Tuple<int, int>(BoardGame.PlayerWhite.Score, BoardGame.PlayerBlack.Score);
 
             // Store all infos
             PreviousTurns.Push(new Tuple<int[,], bool, Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>(copy, WhiteTurn, playersTime, playersScore));
@@ -144,15 +192,15 @@ namespace Otello
             {
                 Tuple<int[,], bool, Tuple<TimeSpan, TimeSpan>, Tuple<int, int>> previousTurn = PreviousTurns.Pop();
 
-                Board.CurrentBoard = previousTurn.Item1;
+                BoardGame.CurrentBoard = previousTurn.Item1;
 
                 WhiteTurn = previousTurn.Item2;
 
-                Board.WhiteTime = previousTurn.Item3.Item1;
-                Board.BlackTime = previousTurn.Item3.Item2;
+                BoardGame.WhiteTime = previousTurn.Item3.Item1;
+                BoardGame.BlackTime = previousTurn.Item3.Item2;
 
-                Board.WhiteScore = previousTurn.Item4.Item1;
-                Board.BlackScore = previousTurn.Item4.Item2;
+                BoardGame.WhiteScore = previousTurn.Item4.Item1;
+                BoardGame.BlackScore = previousTurn.Item4.Item2;
 
                 return true;
             }
