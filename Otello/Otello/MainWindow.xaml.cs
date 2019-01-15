@@ -43,7 +43,7 @@ namespace Otello
         public MainWindow()
         {
             game = new Game(false);
-            DataContext = game.Board;
+            DataContext = game.BoardGame;
 
             formatter = new BinaryFormatter();
 
@@ -77,7 +77,7 @@ namespace Otello
         {
             game.WhiteTurn = false;
 
-            Board board = game.Board;
+            Board board = game.BoardGame;
             board.InitBoard();
             board.WhiteScore = 2;
             board.BlackScore = 2;
@@ -111,7 +111,7 @@ namespace Otello
                 game.WhiteTurn = gameModel.WhiteTurn;
                 game.PreviousTurns = gameModel.PreviousTurns;
 
-                Board board = game.Board;
+                Board board = game.BoardGame;
                 board.CurrentBoard = gameModel.Board;
                 board.WhiteScore = gameModel.WhiteScore;
                 board.BlackScore = gameModel.BlackScore;
@@ -128,7 +128,7 @@ namespace Otello
 
         private void CommandBinding_Save(object sender, ExecutedRoutedEventArgs e)
         {
-            Board board = game.Board;
+            Board board = game.BoardGame;
             GameModel gameModel = new GameModel(board.GetBoard(), board.WhiteScore, board.BlackScore, board.WhiteTime, board.BlackTime, game.WhiteTurn, game.PreviousTurns);
 
             SaveFileDialog saveFileDialog = new SaveFileDialog
@@ -223,17 +223,19 @@ namespace Otello
                     playerSkipingTurn = false;
                     game.TurnSkipped = true;
                     game.WhiteTurn = !game.WhiteTurn;
+                    game.PlayMoveIA();
+                    DrawTokens();
                     DisplayPossibilites();
                 }
                 else
                 {
                     if (game.WhiteTurn)
                     {
-                        game.Board.WhiteTime += elapsedTime;
+                        game.BoardGame.WhiteTime += elapsedTime;
                     }
                     else
                     {
-                        game.Board.BlackTime += elapsedTime;
+                        game.BoardGame.BlackTime += elapsedTime;
                     }
                 }
             }
@@ -253,6 +255,7 @@ namespace Otello
                     {
                         game.PushCurrentTurnForUndo();
                         game.PlayMove(possibility.Item1, possibility.Item2);
+                        game.PlayMoveIA();
                         DrawTokens();
                         DisplayPossibilites();
                         MoveStar();
@@ -430,7 +433,7 @@ namespace Otello
 
         private void DrawTokens()
         {
-            int[,] board = game.Board.GetBoard();
+            int[,] board = game.BoardGame.GetBoard();
 
             // Delete all previous tokens
             for (int i = 0; i < gameGrid.Children.Count; i++)
@@ -503,7 +506,7 @@ namespace Otello
 
             if (possibilities.Count <= 0)
             {
-                if (game.Board.IsBoardFull())
+                if (game.BoardGame.IsBoardFull())
                 {
                     EndGame();
                 }
@@ -518,11 +521,11 @@ namespace Otello
                         string playerName;
                         if (game.WhiteTurn)
                         {
-                            playerName = game.Board.PlayerWhite.Name;
+                            playerName = game.BoardGame.PlayerWhite.Name;
                         }
                         else
                         {
-                            playerName = game.Board.PlayerBlack.Name;
+                            playerName = game.BoardGame.PlayerBlack.Name;
                         }
 
                         messageInfo.Content = "Le joueur " + playerName + " passe son tour, aucun coup possible !";
@@ -575,13 +578,13 @@ namespace Otello
         /// </summary>
         private void EndGame()
         {
-            if (game.Board.PlayerWhite.Score > game.Board.PlayerBlack.Score)
+            if (game.BoardGame.PlayerWhite.Score > game.BoardGame.PlayerBlack.Score)
             {
-                messageInfo.Content = "Le joueur " + game.Board.PlayerWhite.Name + " à gagné !";
+                messageInfo.Content = "Le joueur " + game.BoardGame.PlayerWhite.Name + " à gagné !";
             }
-            else if (game.Board.PlayerWhite.Score < game.Board.PlayerBlack.Score)
+            else if (game.BoardGame.PlayerWhite.Score < game.BoardGame.PlayerBlack.Score)
             {
-                messageInfo.Content = "Le joueur " + game.Board.PlayerBlack.Name + " à gagné !";
+                messageInfo.Content = "Le joueur " + game.BoardGame.PlayerBlack.Name + " à gagné !";
             }
             else
             {
