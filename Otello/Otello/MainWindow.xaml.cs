@@ -121,6 +121,7 @@ namespace Otello
                 ResetGrid();
                 DrawTokens();
                 DisplayPossibilites();
+                MoveStar();
 
                 dispatcherTimer.Start();
             }
@@ -167,6 +168,7 @@ namespace Otello
                 ResetGrid();
                 DrawTokens();
                 DisplayPossibilites();
+                MoveStar();
 
                 dispatcherTimer.Start();
             }
