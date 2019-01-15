@@ -73,6 +73,14 @@ namespace Otello
             }
         }
 
+        private void ResetGame()
+        {
+            ResetGrid();
+            DrawTokens();
+            DisplayPossibilites();
+            MoveStar();
+        }
+
         private void CommandBinding_New(object sender, ExecutedRoutedEventArgs e)
         {
             game.WhiteTurn = false;
@@ -84,9 +92,7 @@ namespace Otello
             board.WhiteTime = new TimeSpan(0, 0, 0);
             board.BlackTime = new TimeSpan(0, 0, 0);
 
-            ResetGrid();
-            DrawTokens();
-            DisplayPossibilites();
+            ResetGame();
 
             dispatcherTimer.Start();
         }
@@ -118,10 +124,7 @@ namespace Otello
                 board.WhiteTime = gameModel.WhiteTime;
                 board.BlackTime = gameModel.BlackTime;
 
-                ResetGrid();
-                DrawTokens();
-                DisplayPossibilites();
-                MoveStar();
+                ResetGame();
 
                 dispatcherTimer.Start();
             }
@@ -165,10 +168,7 @@ namespace Otello
                 playerSkipingTurn = false;
                 nextTimeClearMessageInfo = DateTime.Now;
 
-                ResetGrid();
-                DrawTokens();
-                DisplayPossibilites();
-                MoveStar();
+                ResetGame();
 
                 dispatcherTimer.Start();
             }
