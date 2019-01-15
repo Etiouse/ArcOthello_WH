@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Otello
 {
@@ -15,10 +16,10 @@ namespace Otello
         public bool WhiteTurn { get; set; }
         public bool TurnSkipped { get; set; }
 
-        public SolidColorBrush WhiteColor { get; private set; }
-        public SolidColorBrush BlackColor { get; private set; }
-        public SolidColorBrush WhiteColorPreview { get; private set; }
-        public SolidColorBrush BlackColorPreview { get; private set; }
+        public ImageBrush WhiteColor { get; private set; }
+        public ImageBrush BlackColor { get; private set; }
+        public ImageBrush WhiteColorPreview { get; private set; }
+        public ImageBrush BlackColorPreview { get; private set; }
 
         public Stack<Tuple<int[,], bool, Tuple<TimeSpan, TimeSpan>, Tuple<int, int>>> PreviousTurns { get; set; }
 
@@ -32,11 +33,30 @@ namespace Otello
 
             WhiteTurn = whiteBegins;
 
+            ImageBrush whiteBrush = new ImageBrush
+            {
+                ImageSource = new BitmapImage(new Uri("../../Images/WhiteColor.png", UriKind.Relative))
+            };
+            ImageBrush blackBrush = new ImageBrush
+            {
+                ImageSource = new BitmapImage(new Uri("../../Images/BlackColor.png", UriKind.Relative))
+            };
+            ImageBrush whiteBrushPreview = new ImageBrush
+            {
+                ImageSource = new BitmapImage(new Uri("../../Images/WhiteColor.png", UriKind.Relative)),
+                Opacity = 0.5
+            };
+            ImageBrush blackBrushPreview = new ImageBrush
+            {
+                ImageSource = new BitmapImage(new Uri("../../Images/BlackColor.png", UriKind.Relative)),
+                Opacity = 0.5
+            };
+
             GameStart = true;
-            WhiteColor = Brushes.Red;
-            BlackColor = Brushes.Blue;
-            WhiteColorPreview = new SolidColorBrush(Color.FromArgb(255, 255, 65, 105));
-            BlackColorPreview = new SolidColorBrush(Color.FromArgb(255, 0, 170, 255));
+            WhiteColor = whiteBrush;
+            BlackColor = blackBrush;
+            WhiteColorPreview = whiteBrushPreview;
+            BlackColorPreview = blackBrushPreview;
 
             TurnSkipped = false;
 
@@ -82,7 +102,7 @@ namespace Otello
         /// Returns the color of the current player turn
         /// </summary>
         /// <returns>The color of the current player turn</returns>
-        public SolidColorBrush CurrentPlayerColor()
+        public ImageBrush CurrentPlayerColor()
         {
             if (WhiteTurn)
             {

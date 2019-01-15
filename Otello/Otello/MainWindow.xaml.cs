@@ -11,7 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using Path = System.IO.Path;
+using System.Windows.Media.Animation;
 
 namespace Otello
 {
@@ -24,11 +24,9 @@ namespace Otello
         private const int TIME_BEFORE_CLEAR_MESSAGE_INFO = 2;
 
         private bool playerSkipingTurn;
+        private double lastStarXShift;
 
         private Game game;
-
-        private SolidColorBrush colorWhitePlayer = Brushes.Red;
-        private SolidColorBrush colorBlackPlayer = Brushes.Blue;
         private DispatcherTimer dispatcherTimer;
         private DateTime lastTime;
         private DateTime nextTimeClearMessageInfo;
@@ -53,6 +51,7 @@ namespace Otello
             lastTime = DateTime.Now;
 
             playerSkipingTurn = false;
+            lastStarXShift = 0;
 
             dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += new EventHandler(DispatcherTimer_Tick);
@@ -175,8 +174,8 @@ namespace Otello
 
         public void UpdateSize(object sender, RoutedEventArgs e)
         {
-            sizeCells = (int)Math.Min(layout.ColumnDefinitions[0].ActualWidth / (Board.COLUMNS_NUMBER + 2),
-                                       layout.RowDefinitions[1].ActualHeight / (Board.LINES_NUMBER + 2));
+            sizeCells = (int)Math.Min(Layout.ColumnDefinitions[0].ActualWidth / (Board.COLUMNS_NUMBER + 2),
+                                       Layout.RowDefinitions[1].ActualHeight / (Board.LINES_NUMBER + 2));
             InitGridPosition();
 
             for (int i = 0; i < gameGrid.ColumnDefinitions.Count; i++)
@@ -206,8 +205,8 @@ namespace Otello
         override
         protected void OnSourceInitialized(EventArgs args)
         {
-            sizeCells = (int)Math.Min(layout.ColumnDefinitions[0].ActualWidth / (Board.COLUMNS_NUMBER + 2),
-                                       layout.RowDefinitions[1].ActualHeight / (Board.LINES_NUMBER + 2));
+            sizeCells = (int)Math.Min(Layout.ColumnDefinitions[0].ActualWidth / (Board.COLUMNS_NUMBER + 2),
+                                       Layout.RowDefinitions[1].ActualHeight / (Board.LINES_NUMBER + 2));
             PlayGameInInterface();
         }
 
@@ -256,9 +255,25 @@ namespace Otello
                         game.PlayMove(possibility.Item1, possibility.Item2);
                         DrawTokens();
                         DisplayPossibilites();
+                        MoveStar();
                     }
                 }
             }
+        }
+
+        private void MoveStar()
+        {
+            double ratio = (double) game.Board.BlackScore / (game.Board.WhiteScore + game.Board.BlackScore);
+            double width = Layout.ColumnDefinitions[0].ActualWidth;
+
+            double newShiftX = (ratio * width) - (Layout.ColumnDefinitions[0].ActualWidth / 2);
+
+            TranslateTransform transform = new TranslateTransform();
+            StarImage.RenderTransform = transform;
+            DoubleAnimation translate = new DoubleAnimation(lastStarXShift, newShiftX, TimeSpan.FromSeconds(0.4));
+            transform.BeginAnimation(TranslateTransform.XProperty, translate);
+
+            lastStarXShift = newShiftX;
         }
 
         private void PlayGameInInterface()
@@ -274,8 +289,8 @@ namespace Otello
 
         private void InitGridPosition()
         {
-            int shiftLeft = (int)(layout.ColumnDefinitions[0].ActualWidth - (Board.COLUMNS_NUMBER + 2) * sizeCells) / 2;
-            int shiftTop = (int)(layout.RowDefinitions[1].ActualHeight - (Board.LINES_NUMBER + 2) * sizeCells) / 2;
+            int shiftLeft = (int)(Layout.ColumnDefinitions[0].ActualWidth - (Board.COLUMNS_NUMBER + 2) * sizeCells) / 2;
+            int shiftTop = (int)(Layout.RowDefinitions[1].ActualHeight - (Board.LINES_NUMBER + 2) * sizeCells) / 2;
             gameGrid.Margin = new Thickness(shiftLeft, shiftTop, 0, 0);
         }
 
@@ -296,7 +311,8 @@ namespace Otello
                     Content = letter,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
-                    FontSize = 25
+                    FontSize = 25,
+                    Foreground = Brushes.White
                 };
 
                 Grid.SetColumn(label, i);
@@ -320,7 +336,8 @@ namespace Otello
                     Content = i,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
-                    FontSize = 25
+                    FontSize = 25,
+                    Foreground = Brushes.White
                 };
 
                 Grid.SetColumn(label, 0);
@@ -391,7 +408,9 @@ namespace Otello
             {
                 Height = dataGrid.RowDefinitions[1].ActualHeight - 20,
                 Width = dataGrid.RowDefinitions[1].ActualHeight - 20,
-                Fill = colorWhitePlayer
+                Fill = game.WhiteColor,
+                Stroke = Brushes.White,
+                StrokeThickness = 1
             };
             Grid.SetColumn(ellipse, 2);
             Grid.SetRow(ellipse, 1);
@@ -433,14 +452,16 @@ namespace Otello
                         Ellipse ellipse = new Ellipse
                         {
                             Height = sizeCells - 10,
-                            Width = sizeCells - 10
+                            Width = sizeCells - 10,
+                            Stroke = Brushes.White,
+                            StrokeThickness = 1
                         };
                         if (board[i, j] == 0)
                         {
-                            ellipse.Fill = colorWhitePlayer;
+                            ellipse.Fill = game.WhiteColor;
                         } else
                         {
-                            ellipse.Fill = colorBlackPlayer;
+                            ellipse.Fill = game.BlackColor;
                         }
                         Grid.SetColumn(ellipse, i + 1);
                         Grid.SetRow(ellipse, j + 1);
@@ -523,8 +544,6 @@ namespace Otello
                     {
                         Height = sizeCells - 10,
                         Width = sizeCells - 10,
-                        Stroke = Brushes.White,
-                        StrokeThickness = 5
                     };
                     
                     if (game.WhiteTurn)
