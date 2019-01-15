@@ -113,7 +113,7 @@ namespace Otello
                 game.PreviousTurns = gameModel.PreviousTurns;
 
                 Board board = game.Board;
-                board.SetBoard(gameModel.Board);
+                board.CurrentBoard = gameModel.Board;
                 board.WhiteScore = gameModel.WhiteScore;
                 board.BlackScore = gameModel.BlackScore;
                 board.WhiteTime = gameModel.WhiteTime;

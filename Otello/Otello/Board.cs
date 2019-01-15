@@ -111,18 +111,13 @@ namespace Otello
             return CurrentBoard;
         }
 
-        public void SetBoard(int[,] board)
-        {
-            this.CurrentBoard = board;
-        }
-
         /// <summary>
         /// Returns the IA's name
         /// </summary>
         /// <returns>true or false</returns>
         public string GetName()
         {
-            return "IA_WH";
+            return "IAWH";
         }
 
         /// <summary>
