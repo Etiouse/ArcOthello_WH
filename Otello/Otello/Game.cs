@@ -27,6 +27,7 @@ namespace Otello
         /// Default constructor
         /// </summary>
         /// <param name="whiteBegins">True if the white player begins, false if it's the black one</param>
+        /// <param name="playAgainsIA">True if the player plays agains the IA</param>
         public Game(bool whiteBegins, bool playAgainsIA = false)
         {
             BoardGame = new Board();
@@ -84,6 +85,10 @@ namespace Otello
             return false;
         }
 
+        /// <summary>
+        /// Play the next move for the IA.
+        /// </summary>
+        /// <returns>True if the move is valide, false otherwise</returns>
         public bool PlayMoveIA()
         {
             if (PlayAgainsIA && WhiteTurn)
