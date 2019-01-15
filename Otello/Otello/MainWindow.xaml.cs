@@ -266,7 +266,7 @@ namespace Otello
 
         private void MoveStar()
         {
-            double ratio = (double) game.Board.BlackScore / (game.Board.WhiteScore + game.Board.BlackScore);
+            double ratio = (double) game.BoardGame.BlackScore / (game.BoardGame.WhiteScore + game.BoardGame.BlackScore);
             double width = Layout.ColumnDefinitions[0].ActualWidth;
 
             double newShiftX = (ratio * width) - (Layout.ColumnDefinitions[0].ActualWidth / 2);
