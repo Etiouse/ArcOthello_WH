@@ -77,8 +77,8 @@
                         <Label.Foreground>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" >
                                 <GradientStopCollection>
-                                    <GradientStop Color="Red" Offset="0.2"/>
-                                    <GradientStop Color="White" Offset="0.8"/>
+                                    <GradientStop Color="Red" Offset="0.4"/>
+                                    <GradientStop Color="White" Offset="1.0"/>
                                 </GradientStopCollection>
                             </LinearGradientBrush>
                         </Label.Foreground>
@@ -89,8 +89,8 @@
                         <Label.Foreground>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" >
                                 <GradientStopCollection>
-                                    <GradientStop Color="Red" Offset="0.2"/>
-                                    <GradientStop Color="White" Offset="0.8"/>
+                                    <GradientStop Color="Red" Offset="0.4"/>
+                                    <GradientStop Color="White" Offset="1.0"/>
                                 </GradientStopCollection>
                             </LinearGradientBrush>
                         </Label.Foreground>
@@ -101,8 +101,8 @@
                         <Label.Foreground>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" >
                                 <GradientStopCollection>
-                                    <GradientStop Color="Blue" Offset="0.4"/>
-                                    <GradientStop Color="White" Offset="0.8"/>
+                                    <GradientStop Color="DodgerBlue" Offset="0.4"/>
+                                    <GradientStop Color="White" Offset="1.0"/>
                                 </GradientStopCollection>
                             </LinearGradientBrush>
                         </Label.Foreground>
@@ -113,8 +113,8 @@
                         <Label.Foreground>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" >
                                 <GradientStopCollection>
-                                    <GradientStop Color="Blue" Offset="0.2"/>
-                                    <GradientStop Color="White" Offset="0.8"/>
+                                    <GradientStop Color="DodgerBlue" Offset="0.4"/>
+                                    <GradientStop Color="White" Offset="1.0"/>
                                 </GradientStopCollection>
                             </LinearGradientBrush>
                         </Label.Foreground>
