@@ -58,8 +58,12 @@ namespace Otello
             dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 1);
             dispatcherTimer.Start();
         }
-
-        // Custom overflow for the toolbar
+        
+        /// <summary>
+        /// Custom overflow for the toolbar
+        /// </summary>
+        /// <param name="sender">Sender of the call</param>
+        /// <param name="e">Arguments of the events</param>
         private void ToolBar_Loaded(object sender, RoutedEventArgs e)
         {
             ToolBar toolBar = sender as ToolBar;
@@ -73,6 +77,9 @@ namespace Otello
             }
         }
 
+        /// <summary>
+        /// Called to reset the content of the game grid and adapt all of it's displayed informations
+        /// </summary>
         private void ResetGame()
         {
             ResetGrid();
@@ -81,6 +88,11 @@ namespace Otello
             MoveStar();
         }
 
+        /// <summary>
+        /// Binded method called when the new button is pressed
+        /// </summary>
+        /// <param name="sender">Sender of the call</param>
+        /// <param name="e">Arguments of the events</param>
         private void CommandBinding_New(object sender, ExecutedRoutedEventArgs e)
         {
             game.WhiteTurn = false;
@@ -97,6 +109,11 @@ namespace Otello
             dispatcherTimer.Start();
         }
 
+        /// <summary>
+        /// Binded method called when the open / load button is pressed
+        /// </summary>
+        /// <param name="sender">Sender of the call</param>
+        /// <param name="e">Arguments of the events</param>
         private void CommandBinding_Open(object sender, ExecutedRoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
@@ -130,6 +147,11 @@ namespace Otello
             }
         }
 
+        /// <summary>
+        /// Binded method called when the save button is pressed
+        /// </summary>
+        /// <param name="sender">Sender of the call</param>
+        /// <param name="e">Arguments of the events</param>
         private void CommandBinding_Save(object sender, ExecutedRoutedEventArgs e)
         {
             Board board = game.BoardGame;
@@ -154,10 +176,10 @@ namespace Otello
         }
 
         /// <summary>
-        /// Undo a turn if possible.
+        /// Binded method called when the undo button is pressed
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">Sender of the call</param>
+        /// <param name="e">Arguments of the events</param>
         private void CommandBinding_Undo(object sender, ExecutedRoutedEventArgs e)
         {
             bool isFill = game.PopAndApplyLastPushedTurnForUndo();
@@ -174,12 +196,18 @@ namespace Otello
             }
         }
 
+        /// <summary>
+        /// Called on resize event to secure the responsivity of the application
+        /// </summary>
+        /// <param name="sender">Sender of the call</param>
+        /// <param name="e">Arguments of the events</param>
         public void UpdateSize(object sender, RoutedEventArgs e)
         {
             sizeCells = (int)Math.Min(Layout.ColumnDefinitions[0].ActualWidth / (Board.COLUMNS_NUMBER + 2),
                                        Layout.RowDefinitions[1].ActualHeight / (Board.LINES_NUMBER + 2));
             InitGridPosition();
 
+            // Update the dimension of the grid definitions
             for (int i = 0; i < gameGrid.ColumnDefinitions.Count; i++)
             {
                 gameGrid.ColumnDefinitions[i].Width = new GridLength(sizeCells);
@@ -189,6 +217,7 @@ namespace Otello
                 gameGrid.RowDefinitions[j].Height = new GridLength(sizeCells);
             }
 
+            // Update the dimensions of all grid cells visually
             foreach (UIElement child in gameGrid.Children.OfType<Rectangle>())
             {
                 Rectangle rect = (Rectangle) child;
@@ -196,6 +225,7 @@ namespace Otello
                 rect.Height = sizeCells - 1;
             }
 
+            // Update the dimensions of al ltokens visually
             foreach (UIElement child in gameGrid.Children.OfType<Ellipse>())
             {
                 Ellipse ellipse = (Ellipse) child;
@@ -204,14 +234,33 @@ namespace Otello
             }
         }
 
+        /// <summary>
+        /// Called when all ressources are initialized, entry point of the program
+        /// </summary>
+        /// <param name="args">Arguments</param>
         override
         protected void OnSourceInitialized(EventArgs args)
         {
+            // Compute the size of a grid cell
             sizeCells = (int)Math.Min(Layout.ColumnDefinitions[0].ActualWidth / (Board.COLUMNS_NUMBER + 2),
                                        Layout.RowDefinitions[1].ActualHeight / (Board.LINES_NUMBER + 2));
-            PlayGameInInterface();
+
+            // Initialize the game
+            InitGridPosition();
+            InitGridLabels();
+            InitGrid();
+            InitGridDisplay();
+
+            // Draw it's content
+            DrawTokens();
+            DisplayPossibilites();
         }
 
+        /// <summary>
+        /// Called every millisecond to update the timers and refresh the UI 
+        /// </summary>
+        /// <param name="sender">Sender of the call</param>
+        /// <param name="e">Arguments of the events</param>
         private void DispatcherTimer_Tick(object sender, EventArgs e)
         {
             TimeSpan elapsedTime = DateTime.Now - lastTime;
@@ -243,6 +292,11 @@ namespace Otello
             }
         }
 
+        /// <summary>
+        /// Click event
+        /// </summary>
+        /// <param name="sender">Sender of the call</param>
+        /// <param name="e">Arguments of the events</param>
         private void ClickEvent(object sender, MouseButtonEventArgs e)
         {
             if (!playerSkipingTurn)
@@ -266,32 +320,31 @@ namespace Otello
             }
         }
 
+        /// <summary>
+        /// Update the XProperty of the star image depending on the score of both players
+        /// </summary>
         private void MoveStar()
         {
+            // Informations
             double ratio = (double) game.BoardGame.BlackScore / (game.BoardGame.WhiteScore + game.BoardGame.BlackScore);
             double width = Layout.ColumnDefinitions[0].ActualWidth;
 
+            // Shift
             double newShiftX = (ratio * width) - (Layout.ColumnDefinitions[0].ActualWidth / 2);
 
+            // Transform
             TranslateTransform transform = new TranslateTransform();
             StarImage.RenderTransform = transform;
             DoubleAnimation translate = new DoubleAnimation(lastStarXShift, newShiftX, TimeSpan.FromSeconds(0.4));
             transform.BeginAnimation(TranslateTransform.XProperty, translate);
 
+            // Persistence
             lastStarXShift = newShiftX;
         }
 
-        private void PlayGameInInterface()
-        {
-            InitGridPosition();
-            InitGridLabels();
-            InitGrid();
-            InitGridDisplay();
-
-            DrawTokens();
-            DisplayPossibilites();
-        }
-
+        /// <summary>
+        /// Setup the grid position depending on the window dimensions
+        /// </summary>
         private void InitGridPosition()
         {
             int shiftLeft = (int)(Layout.ColumnDefinitions[0].ActualWidth - (Board.COLUMNS_NUMBER + 2) * sizeCells) / 2;
@@ -299,9 +352,12 @@ namespace Otello
             gameGrid.Margin = new Thickness(shiftLeft, shiftTop, 0, 0);
         }
 
+        /// <summary>
+        /// Compute and draw the labels of the game grid
+        /// </summary>
         private void InitGridLabels()
         {
-            // Colonnes
+            // Columns
             char letter = 'A';
             for (int i = 1; i <= Board.COLUMNS_NUMBER; i++)
             {
@@ -327,7 +383,7 @@ namespace Otello
                 letter++;
             }
 
-            // Lignes
+            // Rows
             for (int i = 1; i <= Board.LINES_NUMBER; i++)
             {
                 RowDefinition row = new RowDefinition
@@ -351,6 +407,9 @@ namespace Otello
             }
         }
 
+        /// <summary>
+        /// Compute the definitions for the grid columns and rows
+        /// </summary>
         private void InitGrid()
         {
             for (int i = 1; i <= Board.COLUMNS_NUMBER; i++)
@@ -372,6 +431,9 @@ namespace Otello
             }
         }
 
+        /// <summary>
+        /// Construct the game grid
+        /// </summary>
         private void InitGridDisplay()
         {
             Rectangle rect;
@@ -392,7 +454,7 @@ namespace Otello
 
                     gameGrid.Children.Add(rect);
 
-                    // Interactive cell
+                    // Interactive cell to handle clicks
                     rect = new Rectangle
                     {
                         Height = sizeCells - 1,
@@ -409,6 +471,7 @@ namespace Otello
                 }
             }
 
+            // Display who's turn it is
             Ellipse ellipse = new Ellipse
             {
                 Height = dataGrid.RowDefinitions[1].ActualHeight - 20,
@@ -422,6 +485,9 @@ namespace Otello
             dataGrid.Children.Add(ellipse);
         }
 
+        /// <summary>
+        /// Delete all tokens in the grid
+        /// </summary>
         private void ResetGrid()
         {
             for (int i = gameGrid.Children.Count - 1; i >= 0; i--)
@@ -433,6 +499,9 @@ namespace Otello
             }
         }
 
+        /// <summary>
+        /// Draw all tokens and delete previous ones
+        /// </summary>
         private void DrawTokens()
         {
             int[,] board = game.BoardGame.GetBoard();
@@ -477,6 +546,9 @@ namespace Otello
             }
         }
 
+        /// <summary>
+        /// Display the cells that accepts a new token
+        /// </summary>
         private void DisplayPossibilites()
         {
             List<Tuple<int, int>> possibilities = game.FindNextPossibleMoves();
@@ -495,7 +567,7 @@ namespace Otello
                 gameGrid.Children.Remove(element);
             }
 
-            // Update the current player information
+            // Update the turn display
             for (int i = 0; i < dataGrid.Children.Count; i++)
             {
                 UIElement element = dataGrid.Children[i];
@@ -506,6 +578,7 @@ namespace Otello
                 }
             }
 
+            // Check whenever a player has to skip his turn and the end of a game
             if (possibilities.Count <= 0)
             {
                 if (game.BoardGame.IsBoardFull())
