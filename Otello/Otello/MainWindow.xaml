@@ -21,7 +21,7 @@
         <Grid Name="Layout" Grid.Column="0">
             <!-- Game layout-->
             <Grid.RowDefinitions>
-                <RowDefinition Height="115"></RowDefinition>
+                <RowDefinition Height="95"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="50"></RowDefinition>
             </Grid.RowDefinitions>
@@ -35,7 +35,7 @@
             <Grid Name="dataGrid" Grid.Row="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="45"></RowDefinition>
-                    <RowDefinition Height="70"></RowDefinition>
+                    <RowDefinition Height="50"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="150"></ColumnDefinition>
@@ -45,29 +45,29 @@
                     <ColumnDefinition Width="150"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
 
-                <ToolBar ToolBarTray.IsLocked="True" Loaded="ToolBar_Loaded" Grid.ColumnSpan="5">
+                <ToolBar ToolBarTray.IsLocked="True" Background="Black" Loaded="ToolBar_Loaded" Grid.ColumnSpan="5" >
                     <Button Width="50" Command="New">
                         <StackPanel>
                             <Image Width="20" Source="Images/New.png" />
-                            <TextBlock>New</TextBlock>
+                            <TextBlock Foreground="White">New</TextBlock>
                         </StackPanel>
                     </Button>
                     <Button Width="50" Command="Open">
                         <StackPanel>
                             <Image Width="20" Source="Images/Load.png" />
-                            <TextBlock>Load</TextBlock>
+                            <TextBlock Foreground="White">Load</TextBlock>
                         </StackPanel>
                     </Button>
                     <Button Width="50" Command="Save">
                         <StackPanel>
                             <Image Width="20" Source="Images/Save.png" />
-                            <TextBlock>Save</TextBlock>
+                            <TextBlock Foreground="White">Save</TextBlock>
                         </StackPanel>
                     </Button>
                     <Button Width="50" Command="Undo">
                         <StackPanel>
                             <Image Width="20" Source="Images/Undo.png" />
-                            <TextBlock>Undo</TextBlock>
+                            <TextBlock Foreground="White">Undo</TextBlock>
                         </StackPanel>
                     </Button>
                 </ToolBar>
