@@ -107,6 +107,8 @@ namespace Otello
             ResetGame();
 
             dispatcherTimer.Start();
+
+            game.PreviousTurns.Clear();
         }
 
         /// <summary>
@@ -118,7 +120,7 @@ namespace Otello
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Filter = "otello board files (*.owh)|*.owh|All files (*.*)|*.*",
+                Filter = "othello board files (*.owh)|*.owh|All files (*.*)|*.*",
                 FilterIndex = 1,
                 RestoreDirectory = true
             };
@@ -155,7 +157,8 @@ namespace Otello
         private void CommandBinding_Save(object sender, ExecutedRoutedEventArgs e)
         {
             Board board = game.BoardGame;
-            GameModel gameModel = new GameModel(board.GetBoard(), board.WhiteScore, board.BlackScore, board.WhiteTime, board.BlackTime, game.WhiteTurn, game.PreviousTurns);
+            GameModel gameModel = new GameModel(board.GetBoard(), board.WhiteScore, board.BlackScore,
+                board.WhiteTime, board.BlackTime, game.WhiteTurn, game.PreviousTurns);
 
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
