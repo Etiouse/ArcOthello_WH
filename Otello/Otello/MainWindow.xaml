@@ -28,7 +28,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <!-- Data panel-->
+            <!-- Data and info panel-->
             <Rectangle Grid.Row="0" Fill="Black"></Rectangle>
             <Rectangle Grid.Row="2" Fill="Black"></Rectangle>
 
@@ -45,6 +45,7 @@
                     <ColumnDefinition Width="150"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
 
+                <!-- Toolbar -->
                 <ToolBar ToolBarTray.IsLocked="True" Background="Black" Loaded="ToolBar_Loaded" Grid.ColumnSpan="5" >
                     <Button Width="50" Command="New">
                         <StackPanel>
@@ -71,6 +72,7 @@
                         </StackPanel>
                     </Button>
                 </ToolBar>
+                
                 <!-- Players scores and timers-->
                 <DockPanel Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="20,0,20,0">
                     <Label Content="{Binding WhiteScore}" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center">
@@ -121,7 +123,8 @@
                     </Label>
                 </DockPanel>
             </Grid>
-            <!-- Grille -->
+            
+            <!-- Game Grid -->
             <Image Name="BackgroundImage" Grid.Row="1" Stretch="Fill" Source="Images/Galaxy.jpg"/>
             <Grid Name="gameGrid" Grid.Row="1" Background="#00000000"/>
             <DockPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,0">
