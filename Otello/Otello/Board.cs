@@ -244,9 +244,7 @@ namespace Otello
             {
                 for (int line = 0; line < LINES_NUMBER; line++)
                 {
-                    if (CurrentBoard[col, line] != PlayerWhite.ID &&
-                        CurrentBoard[col, line] != PlayerBlack.ID &&
-                        CheckUsableCase(col, line) &&
+                    if (CheckUsableCase(col, line) &&
                         !CheckIsolation(col, line))
                     {
                         List<Tuple<int, int>> casesToChange = CheckChangesOnBoard(line, col, isWhite);
