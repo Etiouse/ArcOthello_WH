@@ -386,9 +386,7 @@ namespace Otello
             {
                 for (int j = -1; j < 2; j++)
                 {
-                    // Test if the case is in the board and
-                    if (i != 0 &&
-                        j != 0 &&
+                    if ((i != 0 || j != 0) &&
                         column + i >= 0 &&
                         column + i < COLUMNS_NUMBER &&
                         line + j >= 0 &&

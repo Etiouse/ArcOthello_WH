@@ -109,6 +109,8 @@ namespace Otello
             dispatcherTimer.Start();
 
             game.PreviousTurns.Clear();
+
+            messageInfo.Content = "";
         }
 
         /// <summary>
@@ -146,6 +148,8 @@ namespace Otello
                 ResetGame();
 
                 dispatcherTimer.Start();
+
+                messageInfo.Content = "";
             }
         }
 
