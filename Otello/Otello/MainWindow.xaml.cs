@@ -26,6 +26,8 @@ namespace Otello
         private bool playerSkipingTurn;
         private double lastStarXShift;
 
+        private bool playingTurn;
+
         private Game game;
         private DispatcherTimer dispatcherTimer;
         private DateTime lastTime;
@@ -270,44 +272,57 @@ namespace Otello
         /// <param name="e">Arguments of the events</param>
         private void DispatcherTimer_Tick(object sender, EventArgs e)
         {
-            TimeSpan elapsedTime = DateTime.Now - lastTime;
-            lastTime = DateTime.Now;
-
-            if (DateTime.Now >= nextTimeClearMessageInfo)
+            if (!playingTurn)
             {
-                if (playerSkipingTurn)
-                {
-                    messageInfo.Content = "";
-                    playerSkipingTurn = false;
-                    game.TurnSkipped = true;
+                TimeSpan elapsedTime = DateTime.Now - lastTime;
+                lastTime = DateTime.Now;
 
-                    if (game.PlayAgainsIA && game.WhiteTurn)
-                    {
-                        game.PlayMoveIA();
-                        DrawTokens();
-                        DisplayPossibilites();
-                    }
-                    else
-                    {
-                        game.WhiteTurn = !game.WhiteTurn;
-                    }
-                }
-                else
+                if (DateTime.Now >= nextTimeClearMessageInfo)
                 {
-                    if (game.WhiteTurn)
+                    if (playerSkipingTurn)
                     {
-                        if (game.PlayAgainsIA)
+                        messageInfo.Content = "";
+                        playerSkipingTurn = false;
+                        game.TurnSkipped = true;
+
+                        if (game.PlayAgainsIA && game.WhiteTurn)
                         {
                             game.PlayMoveIA();
+                            elapsedTime = DateTime.Now - lastTime;
+                            lastTime = DateTime.Now;
+                            game.BoardGame.WhiteTime += elapsedTime;
                             DrawTokens();
                             DisplayPossibilites();
+                            MoveStar();
                         }
-
-                        game.BoardGame.WhiteTime += elapsedTime;
+                        else
+                        {
+                            game.WhiteTurn = !game.WhiteTurn;
+                        }
                     }
                     else
                     {
-                        game.BoardGame.BlackTime += elapsedTime;
+                        if (game.WhiteTurn)
+                        {
+                            if (game.PlayAgainsIA)
+                            {
+                                game.PlayMoveIA();
+                                elapsedTime = DateTime.Now - lastTime;
+                                lastTime = DateTime.Now;
+                                game.BoardGame.WhiteTime += elapsedTime;
+                                DrawTokens();
+                                DisplayPossibilites();
+                                MoveStar();
+                            }
+                            else
+                            {
+                                game.BoardGame.WhiteTime += elapsedTime;
+                            }
+                        }
+                        else
+                        {
+                            game.BoardGame.BlackTime += elapsedTime;
+                        }
                     }
                 }
             }
@@ -330,12 +345,13 @@ namespace Otello
                 {
                     if (possibility.Item1 == x && possibility.Item2 == y)
                     {
+                        playingTurn = true;
                         game.PushCurrentTurnForUndo();
                         game.PlayMove(possibility.Item1, possibility.Item2);
-                        //game.PlayMoveIA();
                         DrawTokens();
                         DisplayPossibilites();
                         MoveStar();
+                        playingTurn = false;
                     }
                 }
             }
