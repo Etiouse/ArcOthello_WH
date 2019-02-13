@@ -15,7 +15,7 @@ namespace Otello
         public bool GameStart { get; private set; }
         public bool WhiteTurn { get; set; }
         public bool TurnSkipped { get; set; }
-        private bool PlayAgainsIA { get; set; }
+        public bool PlayAgainsIA { get; set; }
 
         public ImageBrush WhiteColor { get; private set; }
         public ImageBrush BlackColor { get; private set; }
@@ -118,18 +118,21 @@ namespace Otello
 
                 // TODO needs to be cleaned and improved, meaby moved ? IA's turn
                 Tuple<int, int> nextMove = BoardGame.GetNextMove(BoardGame.CurrentBoard, 5, WhiteTurn);
+
                 Console.WriteLine(nextMove);
                 Console.Read();
-                column = nextMove.Item1;
-                line = nextMove.Item2;
 
-                // TODO Temp just to ignore the IA's turn if failed
+                // IA pass turn if no next possible move
                 if (nextMove == null)
                 {
                     Console.WriteLine("No next move for the IA");
                     Console.Read();
-                    return true;
+                    WhiteTurn = !WhiteTurn;
+                    return false;
                 }
+
+                column = nextMove.Item1;
+                line = nextMove.Item2;
 
                 if (BoardGame.IsPlayable(column, line, WhiteTurn))
                 {
@@ -139,6 +142,7 @@ namespace Otello
                 if (validMove)
                 {
                     WhiteTurn = !WhiteTurn;
+                    TurnSkipped = false;
                 }
 
                 return validMove;

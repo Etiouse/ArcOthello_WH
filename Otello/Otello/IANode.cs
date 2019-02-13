@@ -40,9 +40,11 @@ namespace Otello
         /// </summary>
         /// <param name="move">The move to apply to the board</param>
         /// <returns>The new node if this board state</returns>
-        public IANode Apply(Tuple<int, int> move, Board board, bool whiteTurn)
+        public IANode Apply(Tuple<int, int> move, bool whiteTurn)
         {
+            Board board = new Board();
             board.CurrentBoard = Board.DeapCopyIntArray(LocalBoard);
+
             bool isPlayable = board.IsPlayable(move.Item1, move.Item2, whiteTurn);
             IANode node = null;
 

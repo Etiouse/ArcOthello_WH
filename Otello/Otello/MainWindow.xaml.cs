@@ -42,7 +42,7 @@ namespace Otello
 
         public MainWindow()
         {
-            game = new Game(false);
+            game = new Game(false, true);
             DataContext = game.BoardGame;
 
             formatter = new BinaryFormatter();
@@ -280,15 +280,29 @@ namespace Otello
                     messageInfo.Content = "";
                     playerSkipingTurn = false;
                     game.TurnSkipped = true;
-                    game.WhiteTurn = !game.WhiteTurn;
-                    game.PlayMoveIA();
-                    DrawTokens();
-                    DisplayPossibilites();
+
+                    if (game.PlayAgainsIA && game.WhiteTurn)
+                    {
+                        game.PlayMoveIA();
+                        DrawTokens();
+                        DisplayPossibilites();
+                    }
+                    else
+                    {
+                        game.WhiteTurn = !game.WhiteTurn;
+                    }
                 }
                 else
                 {
                     if (game.WhiteTurn)
                     {
+                        if (game.PlayAgainsIA)
+                        {
+                            game.PlayMoveIA();
+                            DrawTokens();
+                            DisplayPossibilites();
+                        }
+
                         game.BoardGame.WhiteTime += elapsedTime;
                     }
                     else
@@ -318,7 +332,7 @@ namespace Otello
                     {
                         game.PushCurrentTurnForUndo();
                         game.PlayMove(possibility.Item1, possibility.Item2);
-                        game.PlayMoveIA();
+                        //game.PlayMoveIA();
                         DrawTokens();
                         DisplayPossibilites();
                         MoveStar();

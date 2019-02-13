@@ -330,7 +330,7 @@ namespace Otello
             foreach (Tuple<int, int> move in node.Moves)
             {
                 // Apply the current move and create a new node with it
-                IANode newNode = node.Apply(move, new Board(), whiteTurn);
+                IANode newNode = node.Apply(move, whiteTurn);
 
                 // Recursiv call of AlphaBeta with changes
                 Tuple<float, Tuple<int, int>> res = AlphaBeta(newNode, depth - 1, -minOrMax, !whiteTurn, currentVal);
