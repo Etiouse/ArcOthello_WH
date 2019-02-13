@@ -120,8 +120,6 @@ namespace Otello
                 Tuple<int, int> nextMove = BoardGame.GetNextMove(BoardGame.CurrentBoard, 5, WhiteTurn);
                 Console.WriteLine(nextMove);
                 Console.Read();
-                column = nextMove.Item1;
-                line = nextMove.Item2;
 
                 // TODO Temp just to ignore the IA's turn if failed
                 if (nextMove == null)
@@ -130,6 +128,9 @@ namespace Otello
                     Console.Read();
                     return true;
                 }
+
+                column = nextMove.Item1;
+                line = nextMove.Item2;
 
                 if (BoardGame.IsPlayable(column, line, WhiteTurn))
                 {

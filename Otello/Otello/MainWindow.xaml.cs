@@ -42,7 +42,7 @@ namespace Otello
 
         public MainWindow()
         {
-            game = new Game(false);
+            game = new Game(false, true);
             DataContext = game.BoardGame;
 
             formatter = new BinaryFormatter();
