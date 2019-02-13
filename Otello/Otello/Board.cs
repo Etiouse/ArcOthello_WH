@@ -158,7 +158,7 @@ namespace Otello
         {
             List<Tuple<int, int>> pos = GetNextPossibleMoves(whiteTurn);
 
-            Tuple<int, int> nextMove = AlphaBeta(new IANode(CurrentBoard, pos), level, 1, whiteTurn).Item2;
+            Tuple<int, int> nextMove = AlphaBeta(new IANode(CurrentBoard, null, pos), level, 1, whiteTurn).Item2;
 
             return nextMove;
         }

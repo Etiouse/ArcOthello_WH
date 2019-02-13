@@ -9,11 +9,21 @@ namespace Otello
     class IANode
     {
         public int[,] LocalBoard { get; set; }
+        public Tuple<int, int> PreviousMove { get; set; }
         public List<Tuple<int, int>> Moves { get; set; }
 
-        public IANode(int[,] board, List<Tuple<int, int>> moves)
+        private readonly int[,] evaluationMatrix = new int[,] { { 30,-25, 10, 5 , 1 , 5 , 10,-25, 30},
+                                                                {-25,-25, 1 , 1 , 1 , 1 , 1 ,-25,-25},
+                                                                { 10, 1 , 5 , 2 , 2 , 2 , 5 , 1 , 10},
+                                                                { 5 , 1 , 2 , 1 , 1 , 1 , 2 , 1 , 5 },
+                                                                { 10, 1 , 5 , 2 , 2 , 2 , 5 , 1 , 10},
+                                                                {-25,-25, 1 , 1 , 1 , 1 , 1 ,-25,-25},
+                                                                { 30,-25, 10, 5 , 1 , 5 , 10,-25, 30} };
+
+        public IANode(int[,] board, Tuple<int, int> previousNode, List<Tuple<int, int>> moves)
         {
             LocalBoard = Board.DeapCopyIntArray(board);
+            PreviousMove = previousNode;
             Moves = moves;
         }
 
@@ -23,7 +33,7 @@ namespace Otello
         /// <returns>The number that correspond to the score of the function</returns>
         public float Eval()
         {
-            return 0;
+            return evaluationMatrix[PreviousMove.Item2, PreviousMove.Item1];
         }
 
         /// <summary>
@@ -52,7 +62,7 @@ namespace Otello
             {
                 board.PlayMove(move.Item1, move.Item2, whiteTurn);
 
-                node = new IANode(board.CurrentBoard, board.GetNextPossibleMoves(!whiteTurn));
+                node = new IANode(board.CurrentBoard, move, board.GetNextPossibleMoves(!whiteTurn));
             }
 
             return node;
