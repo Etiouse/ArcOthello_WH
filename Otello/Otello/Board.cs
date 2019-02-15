@@ -330,9 +330,9 @@ namespace Otello
         private Tuple<float, Tuple<int, int>> AlphaBeta(IANode node, int depth, int minOrMax, bool whiteTurn, float parentVal = float.MaxValue)
         {
             // If depth 0 is reached or if the game is finished (TODO)
-            if(depth == 0 || false)
+            if(depth == 0 || node.Final())
             {
-                return new Tuple<float, Tuple<int, int>>(node.Eval(whiteTurn, minOrMax), null);
+                return new Tuple<float, Tuple<int, int>>(node.Eval(whiteTurn, minOrMax), new Tuple<int, int>(-1, -1));
             }
 
             float currentVal = minOrMax * float.MinValue;
