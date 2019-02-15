@@ -85,11 +85,11 @@ namespace Otello
         }
 
         /// <summary>
-        /// Deap copy an array of int and return it
+        /// Deep copy an array of int and return it
         /// </summary>
         /// <param name="original">The original array of int that will be copied</param>
         /// <returns>The copied array of int</returns>
-        public static int[,] DeapCopyIntArray(int[,] original)
+        public static int[,] DeepCopyIntArray(int[,] original)
         {
             int[,] copy = new int[original.GetLength(0), original.GetLength(1)];
             Array.Copy(original, copy, original.Length);
@@ -158,7 +158,7 @@ namespace Otello
         {
             List<Tuple<int, int>> pos = GetNextPossibleMoves(whiteTurn);
 
-            Tuple<int, int> nextMove = AlphaBeta(new IANode(CurrentBoard, null, pos), level, -1, whiteTurn).Item2;
+            Tuple<int, int> nextMove = AlphaBeta(new IANode(game, null, pos), level, -1, whiteTurn).Item2;
 
             return nextMove;
         }
@@ -318,9 +318,9 @@ namespace Otello
         private Tuple<float, Tuple<int, int>> AlphaBeta(IANode node, int depth, int minOrMax, bool whiteTurn, float parentVal = float.MaxValue)
         {
             // If depth 0 is reached or if the game is finished (TODO)
-            if(depth == 0 || false)
+            if(depth == 0 || node.Final())
             {
-                return new Tuple<float, Tuple<int, int>>(node.Eval(), null);
+                return new Tuple<float, Tuple<int, int>>(node.Eval(), new Tuple<int, int>(-1, -1));
             }
 
             float currentVal = minOrMax * float.MinValue;

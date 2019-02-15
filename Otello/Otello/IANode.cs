@@ -22,7 +22,7 @@ namespace Otello
 
         public IANode(int[,] board, Tuple<int, int> previousNode, List<Tuple<int, int>> moves)
         {
-            LocalBoard = Board.DeapCopyIntArray(board);
+            LocalBoard = Board.DeepCopyIntArray(board);
             PreviousMove = previousNode;
             Moves = moves;
         }
@@ -53,7 +53,7 @@ namespace Otello
         public IANode Apply(Tuple<int, int> move, bool whiteTurn)
         {
             Board board = new Board();
-            board.CurrentBoard = Board.DeapCopyIntArray(LocalBoard);
+            board.CurrentBoard = Board.DeepCopyIntArray(LocalBoard);
 
             bool isPlayable = board.IsPlayable(move.Item1, move.Item2, whiteTurn);
             IANode node = null;
