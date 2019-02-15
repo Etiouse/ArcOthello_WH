@@ -338,9 +338,6 @@ namespace Otello
             float currentVal = minOrMax * float.MinValue;
             Tuple<int, int> currentMove = new Tuple<int, int>(-1, -1);
 
-            Console.WriteLine("OK" + node.Moves);
-            Console.Read();
-
             // Check for all possible move on the current board
             foreach (Tuple<int, int> move in node.Moves)
             {
@@ -350,18 +347,29 @@ namespace Otello
                 // Recursiv call of AlphaBeta with changes
                 Tuple<float, Tuple<int, int>> res = AlphaBeta(newNode, depth - 1, -minOrMax, !whiteTurn, currentVal);
 
-                // Test if the new node of the parent node has a best value
-                if (res.Item1 * minOrMax > currentVal * minOrMax)
+                // Test if the new node has a valid move
+                if (res.Item2 != new Tuple<int, int>(-1, -1))
                 {
-                    currentVal = res.Item1;
-                    currentMove = new Tuple<int, int>(move.Item1, move.Item2);
-                    
-                    if (currentVal * minOrMax > parentVal * minOrMax)
+                    // Test if the new node of the parent node has a best value
+                    if (res.Item1 * minOrMax > currentVal * minOrMax)
                     {
-                        break;
+                        currentVal = res.Item1;
+                        currentMove = new Tuple<int, int>(move.Item1, move.Item2);
+
+                        if (currentVal * minOrMax > parentVal * minOrMax)
+                        {
+                            break;
+                        }
                     }
                 }
             }
+
+            for (int i = depth; i > 0; i--)
+            {
+                Console.Write("\t");
+            }
+            Console.WriteLine("OK " + currentMove);
+            Console.Read();
 
             return new Tuple<float, Tuple<int, int>>(currentVal, currentMove);
         }
