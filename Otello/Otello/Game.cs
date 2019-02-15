@@ -119,11 +119,8 @@ namespace Otello
                 // TODO needs to be cleaned and improved, meaby moved ? IA's turn
                 Tuple<int, int> nextMove = BoardGame.GetNextMove(BoardGame.CurrentBoard, 5, WhiteTurn);
 
-                Console.WriteLine(nextMove);
-                Console.Read();
-
                 // IA pass turn if no next possible move
-                if (nextMove == new Tuple<int, int>(-1, -1))
+                if (nextMove.Equals(new Tuple<int, int>(-1, -1)))
                 {
                     Console.WriteLine("No next move for the IA");
                     Console.Read();
