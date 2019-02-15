@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Otello.Properties {
+namespace Othello_HW.Properties {
     using System;
     
     

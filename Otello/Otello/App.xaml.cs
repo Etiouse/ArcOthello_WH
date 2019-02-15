@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Otello
+namespace Othello_HW
 {
     /// <summary>
     /// Logique d'interaction pour App.xaml

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace Otello
+namespace Othello_HW
 {
     class Board : IPlayable.IPlayable, INotifyPropertyChanged
     {
@@ -174,8 +174,6 @@ namespace Otello
             
             //Tuple<int, int> nextMove = AlphaBeta(new IANode(DeepCopyBoard(), null, pos), level, -1, whiteTurn).Item2;
 
-            Console.WriteLine("OK--" + " " + test.Item1 + " " + test.Item2 + " " + test.Item3);
-
             return test.Item2;
         }
 
@@ -336,8 +334,6 @@ namespace Otello
             // If depth 0 is reached or if the game is finished (TODO)
             if(depth == 0 || node.Final())
             {
-                Console.WriteLine(node.Eval(whiteTurn, minOrMax));
-                Console.Read();
                 return new Tuple<float, Tuple<int, int>, int>(node.Eval(whiteTurn, minOrMax), new Tuple<int, int>(-1, -1), depth);
             }
 
@@ -361,19 +357,10 @@ namespace Otello
 
                     if (currentVal * minOrMax > parentVal * minOrMax)
                     {
-                        Console.WriteLine("OKOK");
-                        Console.Read();
                         break;
                     }
                 }
             }
-
-            for (int i = depth; i > 0; i--)
-            {
-                Console.Write("\t");
-            }
-            Console.WriteLine("OK " + currentMove + " " + whiteTurn + " " + minOrMax + " " + node.Moves.Count + " " + currentVal);
-            Console.Read();
 
             return new Tuple<float, Tuple<int, int>, int>(currentVal, currentMove, depth);
         }

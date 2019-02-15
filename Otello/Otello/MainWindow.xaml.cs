@@ -13,7 +13,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Windows.Media.Animation;
 
-namespace Otello
+namespace Othello_HW
 {
     /// <summary>
     /// Logique d'interaction pour MainWindow.xaml
