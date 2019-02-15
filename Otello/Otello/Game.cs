@@ -173,7 +173,7 @@ namespace Otello
         public void PushCurrentTurnForUndo()
         {
             // Deap copy of array
-            int[,] copy = Board.DeepCopyIntArray(BoardGame.CurrentBoard);
+            int[,] copy = BoardGame.DeepCopyIntArray(BoardGame.CurrentBoard);
 
             // Players time
             Tuple<TimeSpan, TimeSpan> playersTime =
