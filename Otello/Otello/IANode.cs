@@ -106,7 +106,7 @@ namespace Otello
         /// <returns>True if the game is over, false otherwise</returns>
         public bool Final()
         {
-            return false;
+            return Moves.Count <= 0;
         }
 
         /// <summary>

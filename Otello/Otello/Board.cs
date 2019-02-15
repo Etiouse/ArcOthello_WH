@@ -169,10 +169,14 @@ namespace Otello
         public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
         {
             List<Tuple<int, int>> pos = GetNextPossibleMoves(whiteTurn);
-            
-            Tuple<int, int> nextMove = AlphaBeta(new IANode(DeepCopyBoard(), null, pos), level, -1, whiteTurn).Item2;
 
-            return nextMove;
+            Tuple<float, Tuple<int, int>, int> test = AlphaBeta(new IANode(DeepCopyBoard(), null, pos), level, 1, whiteTurn);
+            
+            //Tuple<int, int> nextMove = AlphaBeta(new IANode(DeepCopyBoard(), null, pos), level, -1, whiteTurn).Item2;
+
+            Console.WriteLine("OK--" + " " + test.Item1 + " " + test.Item2 + " " + test.Item3);
+
+            return test.Item2;
         }
 
         /// <summary>
@@ -327,12 +331,14 @@ namespace Otello
         /// <param name="minOrMax">Maximize = 1, Minimize = -1</param>
         /// <param name="parentVal">The parent value, first call +infinity to maximize, -infinity to minimize</param>
         /// <returns>The winner node</returns>
-        private Tuple<float, Tuple<int, int>> AlphaBeta(IANode node, int depth, int minOrMax, bool whiteTurn, float parentVal = float.MaxValue)
+        private Tuple<float, Tuple<int, int>, int> AlphaBeta(IANode node, int depth, int minOrMax, bool whiteTurn, float parentVal = float.MaxValue)
         {
             // If depth 0 is reached or if the game is finished (TODO)
             if(depth == 0 || node.Final())
             {
-                return new Tuple<float, Tuple<int, int>>(node.Eval(whiteTurn, minOrMax), new Tuple<int, int>(-1, -1));
+                Console.WriteLine(node.Eval(whiteTurn, minOrMax));
+                Console.Read();
+                return new Tuple<float, Tuple<int, int>, int>(node.Eval(whiteTurn, minOrMax), new Tuple<int, int>(-1, -1), depth);
             }
 
             float currentVal = minOrMax * float.MinValue;
@@ -345,21 +351,19 @@ namespace Otello
                 IANode newNode = node.Apply(move, whiteTurn);
 
                 // Recursiv call of AlphaBeta with changes
-                Tuple<float, Tuple<int, int>> res = AlphaBeta(newNode, depth - 1, -minOrMax, !whiteTurn, currentVal);
-
-                // Test if the new node has a valid move
-                if (res.Item2 != new Tuple<int, int>(-1, -1))
+                Tuple<float, Tuple<int, int>, int> res = AlphaBeta(newNode, depth - 1, -minOrMax, !whiteTurn, currentVal);
+                
+                // Test if the new node of the parent node has a best value
+                if (res.Item1 * minOrMax > currentVal * minOrMax)
                 {
-                    // Test if the new node of the parent node has a best value
-                    if (res.Item1 * minOrMax > currentVal * minOrMax)
-                    {
-                        currentVal = res.Item1;
-                        currentMove = new Tuple<int, int>(move.Item1, move.Item2);
+                    currentVal = res.Item1;
+                    currentMove = new Tuple<int, int>(move.Item1, move.Item2);
 
-                        if (currentVal * minOrMax > parentVal * minOrMax)
-                        {
-                            break;
-                        }
+                    if (currentVal * minOrMax > parentVal * minOrMax)
+                    {
+                        Console.WriteLine("OKOK");
+                        Console.Read();
+                        break;
                     }
                 }
             }
@@ -368,10 +372,10 @@ namespace Otello
             {
                 Console.Write("\t");
             }
-            Console.WriteLine("OK " + currentMove);
+            Console.WriteLine("OK " + currentMove + " " + whiteTurn + " " + minOrMax + " " + node.Moves.Count + " " + currentVal);
             Console.Read();
 
-            return new Tuple<float, Tuple<int, int>>(currentVal, currentMove);
+            return new Tuple<float, Tuple<int, int>, int>(currentVal, currentMove, depth);
         }
 
         /// <summary>
