@@ -19,29 +19,6 @@ namespace Othello_HW
             Moves = moves;
         }
 
-        private Tuple<int, int> CornersScore()
-        {
-            int whiteCorners = 0;
-            int blackCorners = 0;
-
-            int[,] grid = LocalBoard.GetBoard();
-
-            if (grid[0, 0] == 0) whiteCorners++;
-            else if (grid[0, 0] == 1) blackCorners++;
-
-            if (grid[0, grid.GetLength(1) - 1] == 0) whiteCorners++;
-            else if (grid[0, grid.GetLength(1) - 1] == 1) blackCorners++;
-
-            if (grid[grid.GetLength(0) - 1, 0] == 0) whiteCorners++;
-            else if (grid[grid.GetLength(0) - 1, 0] == 1) blackCorners++;
-
-            if (grid[grid.GetLength(0) - 1, grid.GetLength(1) - 1] == 0) whiteCorners++;
-            else if (grid[grid.GetLength(0) - 1, grid.GetLength(1) - 1] == 1) blackCorners++;
-
-
-            return new Tuple<int, int>(whiteCorners, blackCorners);
-        }
-
         /// <summary>
         /// Evaluation function
         /// </summary>
@@ -63,7 +40,7 @@ namespace Othello_HW
             int whiteMobility = LocalBoard.GetNextPossibleMoves(true).Capacity;
             int blackMobility = LocalBoard.GetNextPossibleMoves(false).Capacity;
 
-            if (minOrMax == 1 ^ whiteTurn)
+            if ((minOrMax == 1) ^ whiteTurn)
             {
                 maxPlayerScore = LocalBoard.BlackScore;
                 minPlayerScore = LocalBoard.WhiteScore;
@@ -129,6 +106,28 @@ namespace Othello_HW
             }
 
             return node;
+        }
+
+        private Tuple<int, int> CornersScore()
+        {
+            int whiteCorners = 0;
+            int blackCorners = 0;
+
+            int[,] grid = LocalBoard.GetBoard();
+
+            if (grid[0, 0] == 0) whiteCorners++;
+            else if (grid[0, 0] == 1) blackCorners++;
+
+            if (grid[0, grid.GetLength(1) - 1] == 0) whiteCorners++;
+            else if (grid[0, grid.GetLength(1) - 1] == 1) blackCorners++;
+
+            if (grid[grid.GetLength(0) - 1, 0] == 0) whiteCorners++;
+            else if (grid[grid.GetLength(0) - 1, 0] == 1) blackCorners++;
+
+            if (grid[grid.GetLength(0) - 1, grid.GetLength(1) - 1] == 0) whiteCorners++;
+            else if (grid[grid.GetLength(0) - 1, grid.GetLength(1) - 1] == 1) blackCorners++;
+            
+            return new Tuple<int, int>(whiteCorners, blackCorners);
         }
     }
 }

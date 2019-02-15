@@ -169,12 +169,10 @@ namespace Othello_HW
         public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
         {
             List<Tuple<int, int>> pos = GetNextPossibleMoves(whiteTurn);
-
-            Tuple<float, Tuple<int, int>, int> test = AlphaBeta(new IANode(DeepCopyBoard(), null, pos), level, 1, whiteTurn);
             
-            //Tuple<int, int> nextMove = AlphaBeta(new IANode(DeepCopyBoard(), null, pos), level, -1, whiteTurn).Item2;
+            Tuple<int, int> nextMove = AlphaBeta(new IANode(DeepCopyBoard(), null, pos), level, 1, whiteTurn).Item2;
 
-            return test.Item2;
+            return nextMove;
         }
 
         /// <summary>
@@ -329,12 +327,12 @@ namespace Othello_HW
         /// <param name="minOrMax">Maximize = 1, Minimize = -1</param>
         /// <param name="parentVal">The parent value, first call +infinity to maximize, -infinity to minimize</param>
         /// <returns>The winner node</returns>
-        private Tuple<float, Tuple<int, int>, int> AlphaBeta(IANode node, int depth, int minOrMax, bool whiteTurn, float parentVal = float.MaxValue)
+        private Tuple<float, Tuple<int, int>> AlphaBeta(IANode node, int depth, int minOrMax, bool whiteTurn, float parentVal = float.MaxValue)
         {
             // If depth 0 is reached or if the game is finished (TODO)
             if(depth == 0 || node.Final())
             {
-                return new Tuple<float, Tuple<int, int>, int>(node.Eval(whiteTurn, minOrMax), new Tuple<int, int>(-1, -1), depth);
+                return new Tuple<float, Tuple<int, int>>(node.Eval(whiteTurn, minOrMax), new Tuple<int, int>(-1, -1));
             }
 
             float currentVal = minOrMax * float.MinValue;
@@ -347,7 +345,7 @@ namespace Othello_HW
                 IANode newNode = node.Apply(move, whiteTurn);
 
                 // Recursiv call of AlphaBeta with changes
-                Tuple<float, Tuple<int, int>, int> res = AlphaBeta(newNode, depth - 1, -minOrMax, !whiteTurn, currentVal);
+                Tuple<float, Tuple<int, int>> res = AlphaBeta(newNode, depth - 1, -minOrMax, !whiteTurn, currentVal);
                 
                 // Test if the new node of the parent node has a best value
                 if (res.Item1 * minOrMax > currentVal * minOrMax)
@@ -362,7 +360,7 @@ namespace Othello_HW
                 }
             }
 
-            return new Tuple<float, Tuple<int, int>, int>(currentVal, currentMove, depth);
+            return new Tuple<float, Tuple<int, int>>(currentVal, currentMove);
         }
 
         /// <summary>
