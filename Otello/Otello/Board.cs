@@ -324,7 +324,10 @@ namespace Otello
             }
 
             float currentVal = minOrMax * float.MinValue;
-            Tuple<int, int> currentMove = null;
+            Tuple<int, int> currentMove = new Tuple<int, int>(-1, -1);
+
+            Console.WriteLine("OK" + node.Moves);
+            Console.Read();
 
             // Check for all possible move on the current board
             foreach (Tuple<int, int> move in node.Moves)

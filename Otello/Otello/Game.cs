@@ -123,7 +123,7 @@ namespace Otello
                 Console.Read();
 
                 // IA pass turn if no next possible move
-                if (nextMove == null)
+                if (nextMove == new Tuple<int, int>(-1, -1))
                 {
                     Console.WriteLine("No next move for the IA");
                     Console.Read();
