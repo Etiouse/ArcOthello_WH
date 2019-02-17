@@ -169,8 +169,15 @@ namespace Othello_HW
         public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
         {
             List<Tuple<int, int>> pos = GetNextPossibleMoves(whiteTurn);
-            
-            Tuple<int, int> nextMove = AlphaBeta(new IANode(DeepCopyBoard(), null, pos), level, 1, whiteTurn).Item2;
+
+            Board board = new Board()
+            {
+                CurrentBoard = game,
+                WhiteScore = WhiteScore,
+                BlackScore = BlackScore
+            };
+
+            Tuple<int, int> nextMove = AlphaBeta(new IANode(board, null, pos), level, 1, whiteTurn).Item2;
 
             return nextMove;
         }
