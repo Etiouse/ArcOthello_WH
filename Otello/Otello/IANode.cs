@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Othello_HW
 {
@@ -11,6 +8,17 @@ namespace Othello_HW
         public Board LocalBoard { get; set; }
         public Tuple<int, int> PreviousMove { get; set; }
         public List<Tuple<int, int>> Moves { get; set; }
+
+        private const float WEIGHT_SCORE = 0.33f;
+        private const float WEIGHT_CORNERS = 0.33f;
+        private const float WEIGHT_MOBILITY = 0.33f;
+
+        private int maxPlayerScore;
+        private int minPlayerScore;
+        private int maxPlayerCorners;
+        private int minPlayerCorners;
+        private int maxPlayerMobility;
+        private int minPlayerMobility;
 
         public IANode(Board board, Tuple<int, int> previousNode, List<Tuple<int, int>> moves)
         {
@@ -22,24 +30,17 @@ namespace Othello_HW
         /// <summary>
         /// Evaluation function
         /// </summary>
+        /// <param name="whiteTurn">Players turn
+        /// <param name="minOrMax">Minimizing or maximizing operation
         /// <returns>The number that correspond to the score of the function</returns>
         public float Eval(bool whiteTurn, int minOrMax)
         {
-            int maxPlayerScore;
-            int minPlayerScore;
-            int maxPlayerCorners;
-            int minPlayerCorners;
-            int maxPlayerMobility;
-            int minPlayerMobility;
-
-            float weightScore = 0.33f;
-            float weightCorners = 0.33f;
-            float weightMobility = 0.33f;
-
+            // Retrieve board informations
             Tuple<int, int> cornersScore = CornersScore();
             int whiteMobility = LocalBoard.GetNextPossibleMoves(true).Capacity;
             int blackMobility = LocalBoard.GetNextPossibleMoves(false).Capacity;
 
+            // Assign variables
             if ((minOrMax == 1) ^ whiteTurn)
             {
                 maxPlayerScore = LocalBoard.BlackScore;
@@ -74,7 +75,8 @@ namespace Othello_HW
             if (maxPlayerCorners + minPlayerCorners != 0)
                 scoreCorners = (100f * (maxPlayerCorners - minPlayerCorners)) / (maxPlayerCorners + minPlayerCorners);
 
-            return weightScore * scoreParity + weightMobility * scoreMobility + weightCorners * scoreCorners;
+            // Result
+            return WEIGHT_SCORE * scoreParity + WEIGHT_MOBILITY * scoreMobility + WEIGHT_CORNERS * scoreCorners;
         }
 
         /// <summary>
@@ -108,6 +110,10 @@ namespace Othello_HW
             return node;
         }
 
+        /// <summary>
+        /// Compute the number of corners taken
+        /// </summary>
+        /// <returns>How many corners by each player are taken</returns>
         private Tuple<int, int> CornersScore()
         {
             int whiteCorners = 0;
