@@ -9,9 +9,9 @@ namespace Othello_HW
         public Tuple<int, int> PreviousMove { get; set; }
         public List<Tuple<int, int>> Moves { get; set; }
 
-        private const float WEIGHT_SCORE = 0.3f;
-        private const float WEIGHT_MOBILITY = 0.45f;
-        private const float WEIGHT_CORNERS = 0.25f;
+        private const float WEIGHT_SCORE = 0.2f;
+        private const float WEIGHT_MOBILITY = 0.4f;
+        private const float WEIGHT_CORNERS = 0.4f;
 
         private int maxPlayerScore;
         private int minPlayerScore;
